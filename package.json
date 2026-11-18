@@ -1,0 +1,44 @@
+{
+  "name": "ouahad-hackathons",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "catalog": "node src/cli.ts",
+    "preview": "node src/preview.ts",
+    "preview:auth-test": "node src/auth-test-preview.ts",
+    "preview:google": "node --env-file=.env.auth.local src/preview.ts --port 4177",
+    "test": "node --test test/*.test.ts",
+    "test:browser": "node --test test/browser/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "reminders": "node src/reminder-cli.ts",
+    "email": "node src/email-cli.ts"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.12.1",
+    "openid-client": "6.9.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261117.1",
+    "@types/node": "^24.19.2",
+    "cf": "^0.15.0",
+    "esbuild": "^0.28.2",
+    "miniflare": "^4.20260730.0",
+    "playwright": "^1.65.1",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "@cloudflare/config": {
+      "zod": "4.6.7"
+    },
+    "miniflare": {
+      "workerd": "1.20261117.1",
+      "sharp": "0.35.5",
+      "undici": "7.30.1"
+    }
+  }
+}

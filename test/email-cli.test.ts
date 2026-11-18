@@ -1,0 +1,22 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { mkdtemp,copyFile,readFile,rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+const exec=promisify(execFile);
+test("owner smoke CLI is dry by default, rejects unlisted recipients and send without opt-in; secret initialization never prints or overwrites a key",async(t)=>{
+ const cli=fileURLToPath(new URL("../src/email-cli.ts",import.meta.url));
+ const env={...process.env,EMAIL_DELIVERY_MODE:"resend",EMAIL_FROM:"no-reply@notify.ouahad.space",RESEND_API_KEY:"fake-test-key",EMAIL_ENCRYPTION_KEY:Buffer.alloc(32,3).toString("base64url"),EMAIL_OWNER_ADDRESSES:"owner@example.org",EMAIL_SMOKE_ALLOWED:"false",AUTH_ORIGIN:"https://hackathons.ouahad.space"};
+ const dry=await exec(process.execPath,[cli,"smoke","signin","--to","owner@example.org"],{env});assert.equal(JSON.parse(dry.stdout).state,"dry_run");assert.ok(!dry.stdout.includes(env.RESEND_API_KEY));assert.ok(!dry.stdout.includes(env.EMAIL_ENCRYPTION_KEY));
+ await assert.rejects(exec(process.execPath,[cli,"smoke","signin","--to","other@example.org"],{env}),/Exact owner-controlled address/);
+ await assert.rejects(exec(process.execPath,[cli,"smoke","signin","--to","owner@example.org","--send"],{env}),/EMAIL_SMOKE_ALLOWED=true/);
+ const folder=await mkdtemp(join(tmpdir(),"ouahad-email-init-"));t.after(()=>rm(folder,{recursive:true,force:true}));
+ await copyFile(new URL("../.env.email.example",import.meta.url),join(folder,".env.email.example"));
+ const script=fileURLToPath(new URL("../scripts/prepare-email-env.ts",import.meta.url));
+ const first=await exec(process.execPath,[script],{cwd:folder}),content=await readFile(join(folder,".env.email.local"),"utf8");
+ const key=/^EMAIL_ENCRYPTION_KEY=(.+)$/m.exec(content)?.[1];assert.ok(key);assert.ok(!first.stdout.includes(key));assert.ok(content.includes("EMAIL_DELIVERY_MODE=disabled"));
+ await exec(process.execPath,[script],{cwd:folder});assert.ok(content===await readFile(join(folder,".env.email.local"),"utf8"));
+});

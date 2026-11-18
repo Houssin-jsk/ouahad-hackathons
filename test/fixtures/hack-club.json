@@ -1,0 +1,23 @@
+{
+  "data": [
+    {
+      "id": "recDFXvSpx4603YEa",
+      "name": "Radish Jam",
+      "url": "https://radish.hackclub.com/",
+      "format": "online",
+      "description": "No entry fee. Full creative control. A global software jam for teens.",
+      "startDate": "2026-06-22",
+      "endDate": "2026-07-10"
+    },
+    {
+      "id": "rec8Rl8byVdqM6Yuk",
+      "name": "Ember",
+      "url": "https://ember.hackclub.com",
+      "format": "online",
+      "description": "Join a two-week online Game Jam, create awesome games, and show off your skills!",
+      "startDate": "2026-02-27",
+      "endDate": "2026-03-15"
+    }
+  ],
+  "meta": { "count": 2 }
+}

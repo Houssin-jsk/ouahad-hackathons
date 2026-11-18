@@ -1,0 +1,72 @@
+[
+  {
+    "source": "uca-rss",
+    "externalId": "https://cim.uca.ma/?p=5562",
+    "facts": {
+      "organizer": "Université Cadi Ayyad, Cité de l’Innovation",
+      "countryCode": "MA",
+      "format": "in-person",
+      "city": "Marrakech",
+      "topics": ["water", "sustainability"],
+      "eventStart": "2026-11-23",
+      "eventEnd": "2026-11-24",
+      "registrationDeadline": "2026-11-04",
+      "timeZone": "Africa/Casablanca",
+      "applicationUrl": "https://www.uca.ma/forms/water4future/candidatures",
+      "registrationStatus": "closed",
+      "registrationNote": "The official application page lists November 4 as the registration deadline and says applications are closed.",
+      "moroccoEligibility": { "status": "confirmed", "note": "The call explicitly invites students at Moroccan universities in the listed degree stages." },
+      "review": {
+        "url": "https://www.uca.ma/forms/water4future/candidatures",
+        "checkedAt": "2026-11-17T14:26:00Z"
+      }
+    }
+  },
+  {
+    "source": "uca-rss",
+    "externalId": "https://cim.uca.ma/?p=5426",
+    "facts": {
+      "countryCode": "MA",
+      "format": "in-person",
+      "city": "Marrakech",
+      "topics": ["cultural heritage", "entrepreneurship"],
+      "eventStart": "2026-04-03",
+      "eventEnd": "2026-04-04",
+      "registrationDeadline": "2026-03-24",
+      "timeZone": "Africa/Casablanca",
+      "moroccoEligibility": { "status": "confirmed", "note": "The call invites students, entrepreneurs and professionals interested in Moroccan heritage and names local institutions as partners." },
+      "review": {
+        "url": "https://cim.uca.ma/wp-content/uploads/2026/03/Appel-a-participation-Hackathon-Memoire-Patrimoine-Innovation-Investissement.pdf",
+        "checkedAt": "2026-11-17T14:24:00Z"
+      }
+    }
+  },
+  {
+    "source": "hack-club",
+    "externalId": "recDFXvSpx4603YEa",
+    "facts": {
+      "organizer": "Hack Club",
+      "topics": ["software"],
+      "rulesUrl": "https://radish.hackclub.com/",
+      "registrationStatus": "closed",
+      "registrationNote": "The archived organizer page says the event is over at the registration control.",
+      "moroccoEligibility": { "status": "confirmed", "note": "The organizer explicitly allows participants 18 or younger regardless of location." },
+      "review": { "url": "https://radish.hackclub.com/", "checkedAt": "2026-11-17T14:24:00Z" }
+    }
+  },
+  {
+    "source": "hack-club",
+    "externalId": "rec8Rl8byVdqM6Yuk",
+    "facts": {
+      "organizer": "Hack Club",
+      "topics": ["game development"],
+      "applicationUrl": "https://itch.io/jam/ember",
+      "rulesUrl": "https://ember.hackclub.com/",
+      "registrationStatus": "closed",
+      "registrationNote": "The official itch.io entry page says the jam has ended and links to the results.",
+      "submissionDeadlineNote": "The rules state March 15 at 11:59 PM EST, but the official entry page lists a different cutoff; no single timestamp was recorded.",
+      "moroccoEligibility": { "status": "unknown", "note": "The rules specify an age cap of 18 but do not explicitly verify geographic eligibility." },
+      "review": { "url": "https://itch.io/jam/ember", "checkedAt": "2026-11-17T14:26:00Z" }
+    }
+  }
+]

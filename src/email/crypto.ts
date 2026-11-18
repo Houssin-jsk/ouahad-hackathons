@@ -1,0 +1,4 @@
+import { createCipheriv,createDecipheriv,randomBytes,createHash } from "node:crypto";
+export const emailId=(value:unknown)=>createHash("sha256").update(JSON.stringify(value)).digest("hex");
+export function seal(value:unknown,key:string,id:string){const iv=randomBytes(12),cipher=createCipheriv("aes-256-gcm",Buffer.from(key,"base64url"),iv);cipher.setAAD(Buffer.from(id));const encrypted=Buffer.concat([cipher.update(JSON.stringify(value),"utf8"),cipher.final()]);return [iv,cipher.getAuthTag(),encrypted].map((v)=>v.toString("base64url")).join(".");}
+export function unseal<T>(value:string,key:string,id:string):T{const [iv,tag,body]=value.split(".").map((v)=>Buffer.from(v,"base64url"));const cipher=createDecipheriv("aes-256-gcm",Buffer.from(key,"base64url"),iv!);cipher.setAAD(Buffer.from(id));cipher.setAuthTag(tag!);return JSON.parse(Buffer.concat([cipher.update(body!),cipher.final()]).toString("utf8"));}

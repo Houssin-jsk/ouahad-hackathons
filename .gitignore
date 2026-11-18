@@ -1,0 +1,9 @@
+node_modules/
+.local/
+*.local.json
+.env
+.env.*
+!.env.auth.example
+.dev.vars*
+
+!.env.email.example
