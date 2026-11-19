@@ -9,7 +9,14 @@
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src", "test", "cloudflare.config.ts"]
+  "include": [
+    "src",
+    "test",
+    "cloudflare.config.ts",
+    "wrangler.config.ts"
+  ]
 }

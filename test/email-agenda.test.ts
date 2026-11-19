@@ -66,11 +66,13 @@ test("email expiry, attempts, resend invalidation and cooldown are enforced in D
 test("date controls preserve precision and zones, including nonexistent and repeated local times",()=>{
  assert.equal(fromDateControls("2026-12-10","","",""),"2026-12-10");
  assert.equal(fromDateControls("","","",""),null);
- assert.equal(fromDateControls("2026-12-10","09:00","Africa/Casablanca",""),"2026-12-10T08:00:00.000Z");
- assert.deepEqual(dateControls("2026-12-10T08:00:00Z","Africa/Casablanca"),{date:"2026-12-10",time:"09:00:00"});
+ const instant=fromDateControls("2026-12-10","09:00","Africa/Casablanca","")!;
+ const local=new Intl.DateTimeFormat("en-GB",{timeZone:"Africa/Casablanca",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date(instant));
+ assert.equal(local,"09:00");
+ assert.deepEqual(dateControls(instant,"Africa/Casablanca"),{date:"2026-12-10",time:"09:00:00"});
  assert.deepEqual(dateControls("2026-12-10T09:00+01:00",null),{date:"2026-12-10",time:"09:00:00"});
  assert.equal(fromDateControls("2026-12-10","09:00","","","2026-12-10T09:00+01:00"),"2026-12-10T09:00+01:00");
- assert.equal(fromDateControls("2026-12-10","09:00","Africa/Casablanca","","2026-12-10T09:00:00+01:00"),"2026-12-10T09:00:00+01:00");
+ assert.equal(fromDateControls("2026-12-10","09:00","Africa/Casablanca","",instant),instant);
  assert.throws(()=>fromDateControls("2026-03-08","02:30","America/New_York",""),/does not exist/);
  assert.throws(()=>fromDateControls("2026-11-01","01:30","America/New_York",""),/occurrence/);
  assert.equal(fromDateControls("2026-11-01","01:30","America/New_York","first"),"2026-11-01T05:30:00.000Z");

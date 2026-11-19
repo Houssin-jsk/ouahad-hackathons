@@ -2,6 +2,8 @@ import { XMLParser, XMLValidator } from "fast-xml-parser";
 import { z } from "zod";
 import type { Batch, Source } from "./importer.ts";
 import type { Candidate, ReviewRow } from "./model.ts";
+import { discoverySources, opportunityTitle } from "./discovery-config.ts";
+import type { DiscoverySource } from "./discovery-config.ts";
 
 const HACK_CLUB = "https://hackclub.com/api/v1/events";
 const UCA = "https://cim.uca.ma/feed/";
@@ -27,7 +29,7 @@ const ucaFeed = z.object({
       item: z.array(z.object({
         title: z.string(),
         link: z.url({ protocol: /^https?$/ }),
-        guid: z.string().min(1),
+        guid: z.string().min(1).optional(),
       })).default([]),
     }),
   }),
@@ -129,9 +131,9 @@ export function automaticSources(
         }).parse(xml);
         const { rss } = ucaFeed.parse(parsed);
         return select("uca-rss", UCA, rss.channel.item
-          .filter((item) => reviewed("uca-rss", item.guid) || /\bhackathon\b/i.test(item.title))
+          .filter((item) => reviewed("uca-rss", item.guid ?? item.link) || opportunityTitle(item.title))
           .map((item) => ({
-            externalId: item.guid,
+            externalId: item.guid ?? item.link,
             // RSS pubDate is when the news was posted, not an event date.
             row: { title: item.title, eventUrl: item.link, category: "morocco", format: "unknown" },
           })), reviews, checkedAt("uca-rss"));
@@ -160,41 +162,46 @@ export function automaticSources(
   ];
 }
 
-export const dailySourceNames = ["uca-rss", "hack-club", "github-gaming-rss"] as const;
+export const dailySourceNames = discoverySources.filter(({ enabled }) => enabled).map(({ id }) => id);
+
+export function rssSource(
+  config: DiscoverySource, reviews: ReviewRow[], fetcher: Fetcher = fetch,
+  clock = () => new Date(), onAttempt = (_source: string) => {},
+): Source {
+  return {
+    name: config.id,
+    async load() {
+      const xml = await downloadText(fetcher, config.url, "application/rss+xml, application/xml", () => onAttempt(config.id));
+      if (!validRss(xml)) throw new Error(`Invalid RSS document from ${config.id}`);
+      const parsed: unknown = new XMLParser({
+        parseTagValue: false, htmlEntities: true, isArray: (_name, path) => path === "rss.channel.item",
+      }).parse(xml);
+      const { rss } = ucaFeed.parse(parsed);
+      const entries = rss.channel.item.filter((item) => {
+        if (reviews.some((r) => r.source === config.id && r.externalId === (item.guid ?? item.link))) return true;
+        return config.match === "game-off"
+          ? /\bgame off\b/i.test(item.title) && !/\bwinners?\b|\bresults\b|\bhighlights\b/i.test(item.title)
+          : opportunityTitle(item.title);
+      });
+      return select(config.id, config.url, entries.map((item) => ({
+        externalId: item.guid ?? item.link,
+        row: { title: item.title, eventUrl: item.link, category: config.category, format: "unknown" },
+      })), reviews, clock().toISOString());
+    },
+  };
+}
 
 export function dailySources(
   reviews: ReviewRow[], fetcher: Fetcher = fetch,
   clock = () => new Date(), onAttempt = (_source: string) => {},
+  registry: DiscoverySource[] = discoverySources,
 ): Source[] {
-  const feedUrl = "https://github.blog/open-source/gaming/feed/";
-  return [
-    ...automaticSources(reviews, fetcher, () => clock().toISOString(), onAttempt),
-    {
-      name: "github-gaming-rss",
-      async load() {
-        const xml = await downloadText(fetcher, feedUrl, "application/rss+xml",
-          () => onAttempt("github-gaming-rss"));
-        if (!validRss(xml)) {
-          throw new Error("Invalid GitHub gaming RSS document");
-        }
-        const parsed: unknown = new XMLParser({
-          parseTagValue: false, htmlEntities: true, isArray: (_name, path) => path === "rss.channel.item",
-        }).parse(xml);
-        const { rss } = ucaFeed.parse(parsed);
-        const entries = rss.channel.item.filter((item) =>
-          /\bgame off\b/i.test(item.title) && !/\bwinners?\b|\bresults\b|\bhighlights\b/i.test(item.title));
-        const checkedAt = clock().toISOString();
-        // Discovery only: the post date is not an event date and does not establish eligibility.
-        return {
-          records: [],
-          needsReview: entries.map((item) => ({ externalId: item.guid, title: item.title, url: item.link })),
-          observations: entries.map((item) => ({
-            source: "github-gaming-rss", externalId: item.guid, feedUrl, checkedAt,
-            fields: { title: item.title, eventUrl: item.link, category: "international-online", format: "unknown" },
-          })),
-        };
-      },
-    },
-  ];
+  const legacy = automaticSources(reviews, fetcher, () => clock().toISOString(), onAttempt);
+  return registry.filter(({ enabled }) => enabled).map((config) => {
+    if (config.kind === "hack-club") {
+      if (config.id !== "hack-club" || config.url !== HACK_CLUB) throw new Error("Unknown Hack Club API configuration");
+      return legacy[1]!;
+    }
+    return rssSource(config, reviews, fetcher, clock, onAttempt);
+  });
 }
-

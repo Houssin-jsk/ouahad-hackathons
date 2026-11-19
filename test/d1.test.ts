@@ -1,3 +1,4 @@
+import { fromDateControls } from "../src/private/stage-form.ts";
 import assert from "node:assert/strict";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -196,11 +197,12 @@ test("local D1 reads multi-stage entries, audiences and date-only closure withou
   const record = await inspectEdition(db, id);
   assert.ok(record.pendingId);
   await decideRevision(db, "publish", id, record.pendingId, null, clock);
-  const before = new Date("2026-11-19T22:59:59Z");
+  const midnight = fromDateControls("2026-11-20", "00:00", "Africa/Casablanca", "")!;
+  const before = new Date(Date.parse(midnight) - 1);
   for (const audience of ["morocco", "international-online"] as const) {
     assert.deepEqual((await publicCatalog(db, "open", { now: before, audience })).map((row) => row.id), [id]);
   }
-  const cutoff = new Date("2026-11-19T23:00:00Z");
+  const cutoff = new Date(midnight);
   assert.deepEqual(await publicCatalog(db, "open", { now: cutoff }), []);
   const [archived] = await publicCatalog(db, "archive", { now: cutoff });
   assert.equal(archived?.status, "applications-closed");

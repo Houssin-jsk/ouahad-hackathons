@@ -192,3 +192,5 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.45; stroke-linecap: roun
   .search-input input { font-size: .78rem; }
   .languages { font-size: .7rem; }
 }
+
+.listing-summary { max-width: 65ch; margin-block: .55rem; line-height: 1.55; color: var(--ink); font-size: .94rem; }

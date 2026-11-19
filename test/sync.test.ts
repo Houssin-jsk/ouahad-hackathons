@@ -35,7 +35,8 @@ async function setup(t: TestContext) {
   });
   const reviews = await loadReviews("data/source-reviews.json");
   const response = (url: string) => url.includes("hackclub.com/") ? fixtures.api
-    : url.includes("github.blog/") ? fixtures.github : fixtures.rss;
+    : url.includes("github.blog/") ? fixtures.github : url.includes("cim.uca.ma/") ? fixtures.rss
+      : "<rss><channel><title>Empty official source fixture</title></channel></rss>";
   const fetcher: typeof fetch = async (request) => new Response(response(String(request)));
   return { db: runtime.db, persist, fixtures, reviews, fetcher, response };
 }

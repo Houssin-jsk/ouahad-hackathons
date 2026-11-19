@@ -51,7 +51,13 @@ const stageInput = timingAndEntry.partial().extend({
   format: format.optional(),
   onlineFromMorocco: z.boolean().optional(),
 });
+// Summaries are editorial facts in the same proposed/approved snapshot, never a public side channel.
+const localizedSummary = z.strictObject({
+  text: label.max(600), sourceUrl: url,
+  method: z.enum(["manual", "generated-draft"]),
+});
 const details = timingAndEntry.extend({
+  summaries: z.strictObject({ en: localizedSummary.optional(), fr: localizedSummary.optional(), ar: localizedSummary.optional() }).optional(),
   organizer: label.optional(),
   topics: z.array(label),
   review: review.nullable(),

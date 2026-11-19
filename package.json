@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=24"
+    "node": "^24.22.0 || >=26.12.0"
   },
   "scripts": {
     "catalog": "node src/cli.ts",
@@ -15,7 +15,13 @@
     "test:browser": "node --test test/browser/*.test.ts",
     "typecheck": "tsc --noEmit",
     "reminders": "node src/reminder-cli.ts",
-    "email": "node src/email-cli.ts"
+    "email": "node src/email-cli.ts",
+    "build": "cf build",
+    "deploy:check": "cf deploy --dry-run",
+    "deploy": "cf deploy --prebuilt --no-provision",
+    "types:worker": "cf workers types --no-include-runtime",
+    "test:production": "npm run build && node --test test/production/*.test.ts",
+    "preview:built": "node src/production-preview.ts"
   },
   "dependencies": {
     "fast-xml-parser": "^5.12.1",
@@ -25,17 +31,19 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261117.1",
     "@types/node": "^24.19.2",
-    "cf": "^0.15.0",
+    "cf": "1.0.0-rc.1",
     "esbuild": "^0.28.2",
-    "miniflare": "^4.20260730.0",
+    "miniflare": "4.20260730.0",
     "playwright": "^1.65.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "4.165.0",
+    "miniflare-production": "npm:miniflare@5.20261118.0-beta"
   },
   "overrides": {
     "@cloudflare/config": {
       "zod": "4.6.7"
     },
-    "miniflare": {
+    "miniflare@4.20260730.0": {
       "workerd": "1.20261117.1",
       "sharp": "0.35.5",
       "undici": "7.30.1"

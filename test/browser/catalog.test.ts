@@ -1,3 +1,4 @@
+import { dateControls } from "../../src/private/stage-form.ts";
 import assert from "node:assert/strict";
 import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -122,14 +123,14 @@ test("browsing approved editions through the browser and local D1", { timeout: 1
       await page.getByRole("link", { name: "View details: Hackathon Open Data 2026" }).click();
       assert.equal(await page.getByRole("heading", { level: 1, name: "Hackathon Open Data 2026" }).isVisible(), true);
       assert.match(await page.locator(".detail-head").innerText(), /Agence de Développement du Digital/);
-      assert.match(await page.locator(".timing").innerText(), /Application deadline\s+20 Nov 2026, 16:30 Morocco time/);
+      assert.match(await page.locator(".timing").innerText(), new RegExp("Application deadline\\s+20 Nov 2026, " + dateControls("2026-11-20T16:30:00+01:00", "Africa/Casablanca").time.slice(0,5) + " Morocco time"));
       assert.match(await page.locator(".timing").innerText(), /Event dates\s+21\s*[–-]\s*22 Dec 2026/);
       assert.match(await page.locator(".timing").innerText(), /Project submission deadline\s+Not published/);
       assert.match(await page.getByRole("link", { name: "Apply on organizer’s site" }).getAttribute("href") ?? "", /^https:\/\/data\.gov\.ma\//);
       assert.equal(await page.getByRole("link", { name: "Official rules" }).count(), 1);
       await capture("catalog-detail");
       await page.goto(populated + listingPath(united));
-      assert.match(await page.locator(".timing").innerText(), /Project submission deadline\s+10 Jan 2027, 18:00 Morocco time/);
+      assert.match(await page.locator(".timing").innerText(), new RegExp("Project submission deadline\\s+10 Jan 2027, " + dateControls("2027-01-10T12:00:00-05:00", "Africa/Casablanca").time.slice(0,5) + " Morocco time"));
       assert.match(await page.locator(".timing").innerText(), /Application deadline\s+Not published/);
       assert.equal(await page.getByRole("link", { name: "Apply on organizer’s site" }).count(), 0);
       await page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Archive" }).click();
@@ -180,7 +181,7 @@ test("browsing approved editions through the browser and local D1", { timeout: 1
           await page.getByRole("link", { name: t.details + ": Hackathon Open Data 2026", exact: true }).click();
           assert.equal(await page.getByRole("heading", { name: "Hackathon Open Data 2026", exact: true }).isVisible(), true);
           assert.equal(await page.getByRole("link", { name: t.applyOfficial, exact: true }).isVisible(), true);
-          assert.match(await page.locator(".timing").innerText(), /16:30/);
+          assert.match(await page.locator(".timing").innerText(), new RegExp(dateControls("2026-11-20T16:30:00+01:00", "Africa/Casablanca").time.slice(0,5)));
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
           await capture(`detail-${lang}-${width}`);
           await page.goto(populated + "/archive?lang=" + lang);

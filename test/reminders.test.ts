@@ -1,3 +1,5 @@
+import { reminderDate } from "../src/private/reminder-copy.ts";
+import { dateControls } from "../src/private/stage-form.ts";
 import assert from "node:assert/strict";
 import { test, type TestContext } from "node:test";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
@@ -39,7 +41,7 @@ test("accepted stages require explicit verified consent; local captures are owne
   const runs=await Promise.all([runReminderJob(db,{now:due,capture:true}),runReminderJob(db,{now:due,capture:true})]);
   assert.equal(runs.reduce((total,run)=>total+run.captured,0),1);
   assert.equal((await runReminderJob(db,{now:due,capture:true})).captured,0);
-  const [message]=await reminderMessages(db,"usr_a");assert.ok(message);assert.match(message.body,/09:00.*Morocco time/);assert.match(message.body,/Local capture only/);
+  const [message]=await reminderMessages(db,"usr_a");assert.ok(message);assert.ok(message.body.includes(reminderDate(stage.eventStart!,"en")));assert.match(message.body,/Local capture only/);
   assert.deepEqual(await reminderMessages(db,"usr_b"),[]);assert.deepEqual(await reminderMessages(db,"usr_b",message.id),[]);
   assert.deepEqual(await publicCatalog(db,"all",{now:clock}),[]);
   // An already captured reminder is history, not another queued delivery after opt-in again.
@@ -78,7 +80,7 @@ test("pending schedules are replaced and decline, opt-out, attendance and late w
 test("date-only policy respects the source civil day without inventing an event time; unknown dates wait",async(t)=>{
   const {db,entry,key,enable}=await setup(t);await enable();
   assert.deepEqual(reminderTiming("2026-12-01","Asia/Tokyo"),{due:"2026-11-30T00:00:00.000Z",expires:"2026-11-30T15:00:00.000Z"});
-  assert.equal(reminderTiming("2026-12-01",null)?.due,"2026-11-30T08:00:00.000Z");
+  assert.deepEqual(dateControls(reminderTiming("2026-12-01",null)!.due,"Africa/Casablanca"),{date:"2026-11-30",time:"09:00:00"});
   await changeExternalStage(db,"usr_a",entry,{...stage,eventStart:"2026-12-01",eventEnd:"2026-12-01",timeZone:"Asia/Tokyo"},key);
   assert.equal((await runReminderJob(db,{now:new Date("2026-11-30T00:00:00Z"),capture:true})).captured,1);
   const message=(await reminderMessages(db,"usr_a"))[0]!;

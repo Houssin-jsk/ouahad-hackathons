@@ -1,6 +1,12 @@
-# Ouahad Hackathons — local catalog
+# Ouahad Hackathons
 
 A local catalog for Moroccan hackathons and international events with an online option. Imports propose drafts or revisions; only an explicit owner decision makes a revision visible in public reads. Phase 2 uses the Cloudflare D1 binding in Miniflare (workerd), with no Cloudflare account or remote database required. See [the product design](docs/product-v1.md).
+
+## Production launch
+
+The Worker, assets, dedicated production D1 and daily discovery Cron are deployed. Public reachability at `hackathons.ouahad.space` is pending the DNS cutover; nameservers have not been changed. The launch catalog has three reviewed real entries with AR/FR/EN summaries. Public email remains disabled.
+
+See [the launch guide](docs/launch.md) for exact PowerShell commands, current verification, official launch evidence, six active discovery sources, the DNS-preserving move, Google setup and remaining production checks. Builds require Node 24.22.0 or a supported newer release; use `npm.cmd ci`, `npm.cmd run test:production`, and `npm.cmd run build`. Normal local previews retain their existing stores; the built Worker preview uses a separate store.
 
 ## Browser previews
 
@@ -81,7 +87,7 @@ npm.cmd run catalog -- sync
 npm.cmd run catalog -- review candidates
 ```
 
-`import` reads the six reference examples or a supplied file. `sync` monitors UCA RSS, the Hack Club API, and GitHub Gaming RSS. UCA and Hack Club apply facts from [data/source-reviews.json](data/source-reviews.json); GitHub supplies discovery candidates only. Candidates without organizer review cannot be published. For UCA and Hack Club, add verified facts keyed by the source ID, then sync again; use manual intake for GitHub candidates after checking for an existing edition. Failures return a nonzero exit code and preserve stored and approved editions. Do not open multiple local runtime processes against the same D1 directory; overlapping jobs within one runtime are protected by source leases.
+`import` reads the six reference examples or a supplied file. `sync` monitors the six enabled sources in [the discovery registry](data/discovery-sources.json), including UCA, Hack Club, GitHub Gaming, FST Fès, HCP and Technopark. UCA and Hack Club apply facts from [data/source-reviews.json](data/source-reviews.json); GitHub supplies discovery candidates only. Candidates without organizer review cannot be published. For UCA and Hack Club, add verified facts keyed by the source ID, then sync again; use manual intake for GitHub candidates after checking for an existing edition. Failures return a nonzero exit code and preserve stored and approved editions. Do not open multiple local runtime processes against the same D1 directory; overlapping jobs within one runtime are protected by source leases.
 
 ## Daily sync and source monitoring
 

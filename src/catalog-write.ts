@@ -10,6 +10,24 @@ type Statement = ReturnType<Database["prepare"]>;
 const statement = (db: Database, sql: string, ...values: DbValue[]) =>
   db.prepare(sql).bind(...values);
 
+function officialKey(value: string) {
+  const url = new URL(value); url.hash = "";
+  url.hostname = url.hostname.replace(/^www\./, "");
+  return url.href.replace(/\/$/, "");
+}
+
+export async function possibleEditionMatches(db: Database, title: string, url: string) {
+  const rows = (await db.prepare(`SELECT e.id, r.snapshot FROM editions e JOIN edition_revisions r
+    ON r.id = COALESCE(e.pending_revision_id, e.approved_revision_id)`).all<{ id: string; snapshot: string }>()).results;
+  const key = (text: string) => text.normalize("NFKC").toLowerCase().replace(/[^\p{Letter}\p{Number}]/gu, "");
+  return rows.flatMap((row) => {
+    const facts = JSON.parse(row.snapshot) as Opportunity;
+    const sameLink = officialKey(facts.eventUrl) === officialKey(url);
+    return sameLink || key(facts.title) === key(title) ? [{ id: row.id, title: facts.title,
+      reason: sameLink ? "same-official-url" : "same-title-needs-evidence" }] : [];
+  });
+}
+
 function evidence(db: Database, observation: SourceObservation, editionId: string | null, runId: string | null) {
   const { source, externalId, feedUrl, checkedAt, fields } = observation;
   return statement(db, `
@@ -87,9 +105,23 @@ export async function importIntoD1(
         INSERT INTO sync_guards (id, valid) VALUES (?, EXISTS (
           SELECT 1 FROM sync_leases WHERE source = ? AND run_id = ? AND expires_at > ?
         ))`, runId, monitor.source, runId, finishedAt));
+      const canonicalSeen = new Set<string>();
       for (const row of staged.values()) {
         const { source, externalId, checkedAt, url: feedUrl } = row.provenance;
         const rawKey = JSON.stringify([source, externalId]);
+        // A second feed/reference must not silently create a duplicate edition. Keep its evidence
+        // in the candidate queue for an owner to compare; never merge by title or guess a relationship.
+        const canonical = JSON.stringify([officialKey(row.eventUrl), row.title]);
+        const duplicate = canonicalSeen.has(canonical) || (await possibleEditionMatches(db, row.title, row.eventUrl))
+          .some((match) => match.id !== row.id && match.reason === "same-official-url" && match.title === row.title);
+        if (duplicate) {
+          statements.push(evidence(db, observed.get(rawKey) ?? {
+            source, externalId, checkedAt, feedUrl, fields: row,
+          }, null, runId));
+          observed.delete(rawKey);
+          continue;
+        }
+        canonicalSeen.add(canonical);
         revisionIndices.push(statements.length + 2);
         statements.push(...proposal(db, row, stamp, seedOnly, runId));
         statements.push(evidence(db, observed.get(rawKey) ?? {
@@ -151,10 +183,12 @@ export async function sourceQueue(db: Database, now = new Date()) {
     SELECT source, external_id AS externalId, source_url AS sourceUrl, checked_at AS checkedAt,
       json_extract(observation, '$.title') AS title, json_extract(observation, '$.eventUrl') AS eventUrl
     FROM source_evidence WHERE edition_id IS NULL ORDER BY source, external_id
-  `).all()).results;
+  `).all<{ source: string; externalId: string; sourceUrl: string; checkedAt: string; title: string; eventUrl: string }>()).results;
   const health = (await db.prepare("SELECT * FROM source_health ORDER BY source")
     .all<{ source: string; error: string | null; last_success_at: string | null; missing_reviewed_ids: string }>()).results;
-  return { candidates, health: health.map((row) => ({
+  return { candidates: await Promise.all(candidates.map(async (candidate) => ({ ...candidate,
+    possibleExistingEditions: await possibleEditionMatches(db, candidate.title, candidate.eventUrl),
+  }))), health: health.map((row) => ({
     ...row, missing_reviewed_ids: JSON.parse(row.missing_reviewed_ids) as string[],
     stale: !row.last_success_at || now.getTime() - Date.parse(row.last_success_at) > 48 * 60 * 60 * 1000,
   })) };

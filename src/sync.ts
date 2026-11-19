@@ -1,3 +1,4 @@
+import { discoverySources } from "./discovery-config.ts";
 import { randomUUID } from "node:crypto";
 import { importIntoD1 } from "./catalog-write.ts";
 import type { Source } from "./importer.ts";
@@ -158,13 +159,12 @@ export async function syncStatus(db: Database, now = new Date()) {
     intendedCronUTC: dailyCron, staleAfterHours: 48, sources,
     organizerEvidenceNeedsRechecking: recheck, sourceEvidenceDisagreements: disagreements, recentRuns: runs,
     coverage: {
-      "uca-rss": { refreshes: "UCA news titles, GUIDs and official links; hackathon keyword discovery",
-        needsReview: "Dates, application status, Morocco eligibility, rules and stages" },
-      "hack-club": { refreshes: "Online hackathon/jam identities, titles, sites and program date windows",
-        needsReview: "Morocco eligibility, registration/submission deadlines and required attendance" },
-      "github-gaming-rss": { refreshes: "Game Off announcement candidates; excludes titles marked winners or results",
-        needsReview: "Match to an existing edition before manual intake; no dates or eligibility inferred from posts" },
-      manual: "Organizer pages and feeds outside this small set remain manual intake; none are fetched by the schedule",
+      automatic: discoverySources.filter(({ enabled }) => enabled).map((source) => ({
+        ...source, refreshes: source.kind === "rss" ? "Official announcement identities, titles and links only"
+          : "Explicitly online hackathon/jam identities, titles, links and program date windows",
+        needsReview: "Edition matching, dates, eligibility, registration, rules and localized summaries",
+      })),
+      manual: "Organizer, university and club pages without a tested permitted feed remain manual intake. Social networks and Devpost are not scraped.",
     },
   };
 }

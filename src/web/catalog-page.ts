@@ -169,6 +169,10 @@ function stageFor(entry: PublicListing, filters: Filters) {
   return stages.find((stage) => stage.entry === "direct" && stage.status === "open"
     && stage.moroccoEligibility.status === "confirmed") ?? stages.find((stage) => stage.entry === "direct") ?? stages[0]!;
 }
+function summary(entry: PublicListing, lang: Language) {
+  const text = entry.summaries?.[lang]?.text;
+  return text ? `<p class="listing-summary" lang="${lang}" dir="${lang === "ar" ? "rtl" : "ltr"}">${html(text)}</p>` : "";
+}
 function card(entry: PublicListing, context: Context) {
   const { filters, section } = context, lang = filters.lang, t = messages[lang];
   const stage = stageFor(entry, filters);
@@ -183,7 +187,7 @@ function card(entry: PublicListing, context: Context) {
   return `<article class="card agenda-row" aria-label="${html(entry.title)}">
     <div class="date-rail" aria-hidden="true">${rail}</div>
     <div class="row-main"><div class="card-top"><span class="card-route">${labels(lang)[stage.category]}</span>${statusBadge(entry, lang)}</div>
-      <h3>${published(entry.title)}</h3><p class="card-place">${where(stage, lang)}</p>${topics(entry)}
+      <h3>${published(entry.title)}</h3>${summary(entry, lang)}<p class="card-place">${where(stage, lang)}</p>${topics(entry)}
       ${entry.stages.length > 1 ? `<p class="stage-hint">${published(stage.name ?? t.event)} · ${entry.stages.length} ${t.stages}</p>` : ""}
     </div>
     <div class="row-dates">${timing(stage, lang)}</div>
@@ -323,7 +327,7 @@ export function detail(entry: PublicListing, context: Context = {
     <nav class="back"><a href="${html(location(section, filters))}"><span class="back-arrow" aria-hidden="true">←</span>
       ${section === "/archive" ? t.backArchive : t.backCatalog}</a></nav>
     <header class="detail-head"><div class="detail-badges"><p class="kicker">${labels(lang)[entry.category]}</p>${statusBadge(entry, lang)}</div>
-      <h1>${published(entry.title)}</h1><p>${entry.organizer ? `${t.organized} ${published(entry.organizer)}` : t.noOrganizer}</p>${topics(entry)}
+      <h1>${published(entry.title)}</h1>${summary(entry, lang)}<p>${entry.organizer ? `${t.organized} ${published(entry.organizer)}` : t.noOrganizer}</p>${topics(entry)}
       ${context.privateSave ? `<a class="text-link" href="${html(context.privateSave.href)}">${html(context.privateSave.label)} ${arrow}</a>` : ""}
     </header>
     <div class="detail-grid"><section class="detail-main" aria-labelledby="dates">

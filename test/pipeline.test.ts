@@ -1,3 +1,4 @@
+import { fromDateControls } from "../src/private/stage-form.ts";
 import assert from "node:assert/strict";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -101,8 +102,9 @@ test("expiry uses the registration deadline or event end and preserves the draft
     eventEnd: "2026-11-04T16:30:00+01:00" }]);
   await runImport(repo, [source]);
   const rows = await repo.read();
-  assert.equal(list(rows, "open", new Date("2026-11-02T22:59:59Z")).length, 2);
-  const registrationClosed = new Date("2026-11-02T23:00:00Z");
+  const midnight = fromDateControls("2026-11-03", "00:00", "Africa/Casablanca", "")!;
+  assert.equal(list(rows, "open", new Date(Date.parse(midnight) - 1)).length, 2);
+  const registrationClosed = new Date(midnight);
   assert.equal(list(rows, "open", registrationClosed).length, 1);
   assert.equal(list(rows, "archive", registrationClosed)[0]?.id, "sample-organizer:fall-edition");
   const submissionPassed = new Date("2026-11-04T11:00:01Z");

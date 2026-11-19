@@ -1,0 +1,170 @@
+[
+  {
+    "source": "add-open-data",
+    "externalId": "hackathon-open-data-2026",
+    "title": "Hackathon Open Data 2026",
+    "organizer": "Agence de Développement du Digital (ADD)",
+    "category": "morocco",
+    "format": "in-person",
+    "city": "Rabat",
+    "countryCode": "MA",
+    "topics": [
+      "open data",
+      "civic technology"
+    ],
+    "eventStart": "2026-12-21",
+    "eventEnd": "2026-12-22",
+    "registrationDeadline": "2026-11-20T16:30:00.000Z",
+    "timeZone": "Africa/Casablanca",
+    "eventUrl": "https://data.gov.ma/fr/actualites/lancement-de-la-3eme-edition-du-hackathon-open-data-21-22-decembre-2026-rabat",
+    "applicationUrl": "https://data.gov.ma/fr/candidature-hackathon",
+    "rulesUrl": "https://data.gov.ma/sites/default/files/hackathon/reglement-hackathon-open-data-2026.pdf",
+    "registrationStatus": "open",
+    "registrationNote": "Organizer call: applications before 16:30 local time on 20 November. Exact cutoff converted using Africa/Casablanca; the official form may restrict automated access.",
+    "moroccoEligibility": {
+      "status": "confirmed",
+      "note": "Article 2 invites qualifying adults in academia, startups, civil society and administration; the event is in Rabat."
+    },
+    "review": {
+      "url": "https://data.gov.ma/fr/actualites/lancement-de-la-3eme-edition-du-hackathon-open-data-21-22-decembre-2026-rabat",
+      "checkedAt": "2026-11-19T00:12:00Z"
+    },
+    "summaries": {
+      "en": {
+        "text": "Build with public data at ENSIAS in Rabat. Applications close on 20 November; the on-site hackathon takes place on 21–22 December.",
+        "sourceUrl": "https://data.gov.ma/fr/actualites/lancement-de-la-3eme-edition-du-hackathon-open-data-21-22-decembre-2026-rabat",
+        "method": "manual"
+      },
+      "fr": {
+        "text": "Créez des solutions avec les données publiques à l’ENSIAS, à Rabat. Candidatures jusqu’au 20 novembre ; hackathon sur place les 21 et 22 décembre.",
+        "sourceUrl": "https://data.gov.ma/fr/actualites/lancement-de-la-3eme-edition-du-hackathon-open-data-21-22-decembre-2026-rabat",
+        "method": "manual"
+      },
+      "ar": {
+        "text": "طوّروا حلولاً بالبيانات العمومية في المدرسة الوطنية العليا للمعلوميات وتحليل النظم بالرباط. آخر أجل للترشح 20 نونبر، والهاكاثون حضوري يومي 21 و22 دجنبر.",
+        "sourceUrl": "https://data.gov.ma/fr/actualites/lancement-de-la-3eme-edition-du-hackathon-open-data-21-22-decembre-2026-rabat",
+        "method": "manual"
+      }
+    }
+  },
+  {
+    "source": "geek-room",
+    "externalId": "infer-a-thon-2026",
+    "title": "Infer-a-thon with Superlinked",
+    "organizer": "Geek Room and Superlinked",
+    "category": "international-online",
+    "format": "online",
+    "topics": [
+      "artificial intelligence",
+      "software engineering"
+    ],
+    "eventStart": "2026-12-05",
+    "eventEnd": "2026-12-20",
+    "registrationDeadline": "2026-12-05",
+    "applicationUrl": "https://luma.com/f7ef30j2",
+    "eventUrl": "https://www.geekroom.co.in/event/infer-a-thon",
+    "registrationStatus": "open",
+    "registrationNote": "Organizer states registration is open until 5 December. The Luma registration page invites registration. No exact cutoff time or time zone is given.",
+    "moroccoEligibility": {
+      "status": "confirmed",
+      "note": "Official organizer and Luma event explicitly welcome participants worldwide with no location restriction. Teams of 1–4; each person registers individually."
+    },
+    "review": {
+      "url": "https://luma.com/f7ef30j2",
+      "checkedAt": "2026-11-19T00:12:00Z"
+    },
+    "stages": [
+      {
+        "key": "build",
+        "name": "Building phase",
+        "entry": "direct",
+        "eventStart": "2026-12-05",
+        "eventEnd": "2026-12-11",
+        "registrationDeadline": "2026-12-05",
+        "registrationStatus": "open",
+        "registrationNote": "Organizer states registration is open until 5 December; exact time and zone are not given.",
+        "moroccoEligibility": {
+          "status": "confirmed",
+          "note": "Official Luma eligibility section explicitly permits participation from anywhere in the world."
+        },
+        "evidenceUrl": "https://luma.com/f7ef30j2"
+      },
+      {
+        "key": "final",
+        "name": "Final presentations",
+        "entry": "advancement",
+        "requiresStage": "build",
+        "eventStart": "2026-12-20",
+        "eventEnd": "2026-12-20",
+        "moroccoEligibility": {
+          "status": "confirmed",
+          "note": "Top five teams per track qualify; official participation has no location restriction."
+        },
+        "evidenceUrl": "https://luma.com/f7ef30j2"
+      }
+    ],
+    "summaries": {
+      "en": {
+        "text": "An online AI hackathon open worldwide. Build on 5–11 December; shortlisted teams present in the final on 20 December. Register individually, including team members.",
+        "sourceUrl": "https://luma.com/f7ef30j2",
+        "method": "manual"
+      },
+      "fr": {
+        "text": "Un hackathon IA en ligne ouvert au monde entier. Construction du 5 au 11 décembre, puis finale le 20 décembre pour les équipes sélectionnées. Chaque membre doit s’inscrire.",
+        "sourceUrl": "https://luma.com/f7ef30j2",
+        "method": "manual"
+      },
+      "ar": {
+        "text": "هاكاثون للذكاء الاصطناعي عبر الإنترنت مفتوح للمشاركين من جميع البلدان. البناء من 5 إلى 11 دجنبر، والنهائي للفرق المتأهلة يوم 20 دجنبر. التسجيل فردي لكل عضو.",
+        "sourceUrl": "https://luma.com/f7ef30j2",
+        "method": "manual"
+      }
+    }
+  },
+  {
+    "source": "hcp-tta",
+    "externalId": "datathon-data-territoires-2026",
+    "title": "Datathon Data-Territoires 2026",
+    "organizer": "Haut-Commissariat au Plan et partenaires",
+    "category": "morocco",
+    "format": "unknown",
+    "countryCode": "MA",
+    "topics": [
+      "data science",
+      "territorial development"
+    ],
+    "eventStart": "2026-11-02",
+    "eventEnd": "2026-12-15",
+    "registrationDeadline": "2026-10-30",
+    "submissionDeadline": "2026-12-04",
+    "timeZone": "Africa/Casablanca",
+    "eventUrl": "https://www.hcp.ma/region-tanger/Datathon-Data-Territoires-2026_a804.html",
+    "registrationStatus": "closed",
+    "registrationNote": "Official calendar closes candidatures on 30 October. Project delivery on 4 December is not a registration extension.",
+    "moroccoEligibility": {
+      "status": "confirmed",
+      "note": "Restricted to master, engineering and doctoral students at the listed FST/ENSA in Tanger, Tétouan and Al Hoceima, INSEA and ESI. Check the official institutional criteria."
+    },
+    "review": {
+      "url": "https://www.hcp.ma/region-tanger/Datathon-Data-Territoires-2026_a804.html",
+      "checkedAt": "2026-11-19T00:12:00Z"
+    },
+    "summaries": {
+      "en": {
+        "text": "A territorial-data competition for students at the institutions listed by the HCP. Applications are closed; project delivery is due on 4 December.",
+        "sourceUrl": "https://www.hcp.ma/region-tanger/Datathon-Data-Territoires-2026_a804.html",
+        "method": "manual"
+      },
+      "fr": {
+        "text": "Un datathon territorial destiné aux étudiants des établissements cités par le HCP. Les candidatures sont closes ; les livrables sont attendus le 4 décembre.",
+        "sourceUrl": "https://www.hcp.ma/region-tanger/Datathon-Data-Territoires-2026_a804.html",
+        "method": "manual"
+      },
+      "ar": {
+        "text": "مسابقة في البيانات الترابية لطلبة المؤسسات المحددة من المندوبية السامية للتخطيط. انتهى أجل الترشيح، وآخر أجل لتسليم المشاريع هو 4 دجنبر.",
+        "sourceUrl": "https://www.hcp.ma/region-tanger/Datathon-Data-Territoires-2026_a804.html",
+        "method": "manual"
+      }
+    }
+  }
+]

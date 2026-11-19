@@ -1,0 +1,8 @@
+[
+  { "id": "uca-rss", "name": "Cité de l’Innovation — Université Cadi Ayyad", "kind": "rss", "url": "https://cim.uca.ma/feed/", "category": "morocco", "languages": ["fr", "ar", "en"], "enabled": true },
+  { "id": "hack-club", "name": "Hack Club Events API", "kind": "hack-club", "url": "https://hackclub.com/api/v1/events", "category": "international-online", "languages": ["en"], "enabled": true },
+  { "id": "github-gaming-rss", "name": "GitHub Gaming", "kind": "rss", "url": "https://github.blog/open-source/gaming/feed/", "category": "international-online", "languages": ["en"], "match": "game-off", "enabled": true },
+  { "id": "fst-fes-rss", "name": "FST Fès — Université Sidi Mohamed Ben Abdellah", "kind": "rss", "url": "https://fst-usmba.ac.ma/feed/", "category": "morocco", "languages": ["fr", "ar", "en"], "enabled": true },
+  { "id": "hcp-rss", "name": "Haut-Commissariat au Plan", "kind": "rss", "url": "https://www.hcp.ma/xml/syndication.rss", "category": "morocco", "languages": ["fr", "ar"], "enabled": true },
+  { "id": "technopark-rss", "name": "Technopark Maroc", "kind": "rss", "url": "https://www.technopark.ma/feed/", "category": "morocco", "languages": ["fr", "ar", "en"], "enabled": true }
+]

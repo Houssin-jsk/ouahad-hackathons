@@ -1,3 +1,4 @@
+import { openRemoteD1 } from "./remote-d1.ts";
 import { audiences, publicCatalog, publicViews } from "./catalog-read.ts";
 import {
   decideRevision, importIntoD1, inspectEdition, pendingReviews, sourceQueue, withdrawEdition,
@@ -8,7 +9,8 @@ import { loadReviews, manualSource } from "./sources.ts";
 import { inspectSync, runDailySync, syncStatus } from "./sync.ts";
 import { openScheduledD1 } from "./local-scheduled.ts";
 
-const usage = `npm.cmd run catalog -- migrate
+const usage = `Append --remote <explicit-production-D1-UUID> to owner commands to use Cloudflare D1.
+npm.cmd run catalog -- migrate
 npm.cmd run catalog -- seed
 npm.cmd run catalog -- import [data/references.json]
 npm.cmd run catalog -- sync [data/source-reviews.json]
@@ -24,7 +26,19 @@ npm.cmd run catalog -- withdraw <edition-id> <reason>
 npm.cmd run catalog -- list [all|open|archive] [morocco|international-online]`;
 
 async function main() {
-  const [command, first, second, third, ...extra] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const built = args.includes("--built");
+  if (built) args.splice(args.indexOf("--built"), 1);
+  const remote = args.indexOf("--remote");
+  let remoteId: string | undefined;
+  if (remote >= 0) {
+    remoteId = args[remote + 1];
+    if (!remoteId) throw new Error("--remote requires an explicit D1 UUID");
+    args.splice(remote, 2);
+  }
+  const [command, first, second, third, ...extra] = args;
+  if (remoteId && command === "seed") throw new Error("Phase 1/demo seed is forbidden on remote D1. Import a reviewed launch file instead.");
+  if (remoteId && command === "sync-scheduled") throw new Error("Scheduled simulation is local only. Use sync --remote for a manual production discovery run.");
   if (command === "--help" && !first) {
     console.log(usage);
     return;
@@ -41,7 +55,9 @@ async function main() {
     return;
   }
 
-  const { db, close } = await openLocalD1(process.env.OUAHAD_D1_PATH);
+  if (built && (remoteId || command === "sync-scheduled")) throw new Error("--built is for isolated local artifact verification only");
+  const artifact = built ? await (await import("./production-preview.ts")).openProductionPreview(process.env.OUAHAD_D1_PATH ?? ".local/d1-launch-worker") : null;
+  const { db, close } = artifact ? { db: await artifact.getD1Database("DB"), close: () => artifact.dispose() } : remoteId ? await openRemoteD1(remoteId) : await openLocalD1(process.env.OUAHAD_D1_PATH);
   const show = (value: unknown) => console.log(JSON.stringify(value, null, 2));
   try {
     if (command === "migrate" && first === undefined) {

@@ -66,7 +66,7 @@ export async function publicCatalog(
       || (view === "open" && !confirmedOpen)) return [];
     return [{
       id, competitionId, title: row.title, organizer: row.organizer ?? null,
-      topics: row.topics, category: row.category,
+      topics: row.topics, category: row.category, summaries: row.summaries ?? {},
       format: row.format, city: row.city, countryCode: row.countryCode, eventUrl: row.eventUrl,
       status, archived, confirmedOpen, stages: current,
       evidence: { organizer: row.review, sourceUrl: row.provenance.url, stale: !fresh },
