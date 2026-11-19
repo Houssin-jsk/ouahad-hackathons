@@ -1,4 +1,4 @@
-import { resendConfig } from "./email/config.ts";
+import { accountEmailConfig, resendConfig } from "./email/config.ts";
 import { runTransactionalEmailJob } from "./email/service.ts";
 import type { ExportedHandler, ScheduledController } from "@cloudflare/workers-types";
 import type { InferEnv } from "cf/config";
@@ -8,17 +8,27 @@ import { parseReviews } from "./review-policy.ts";
 import { runDailySync } from "./sync.ts";
 import { authConfig } from "./private/auth-config.ts";
 import { catalogHandler } from "./web/catalog-handler.ts";
+import { reminderCron } from "./reminder-schedule.ts";
+import { dailyCron } from "./sync-schedule.ts";
 
 export type SyncEnv = InferEnv<typeof config.worker>;
 
-// Prepared for a separate runner. The existing source-sync scheduled handler never calls it.
+// Catalog discovery never invokes email. This is selected by its own Cron expression.
 export async function runWorkerEmailJob(env:SyncEnv,now=new Date()){
-  const config=resendConfig(env);if(!config?.publicEnabled)return {state:"disabled"};
-  return runTransactionalEmailJob(env.DB,config,{now,origin:env.AUTH_ORIGIN});
+  const config=env.EMAIL_REMINDER_MODE===undefined?resendConfig(env):accountEmailConfig(env,"reminder");
+  if(!config||env.EMAIL_REMINDER_MODE===undefined&&!config.publicEnabled)return {state:"disabled"};
+  return runTransactionalEmailJob(env.DB,config,{now,origin:env.AUTH_ORIGIN,limit:2});
 }
 
 const worker = {
   async scheduled(event: ScheduledController, env: SyncEnv) {
+    if(event.cron===reminderCron){
+      const results=await runWorkerEmailJob(env);
+      console.log(JSON.stringify({type:"reminder-sync",scheduledTime:event.scheduledTime,
+        results:Array.isArray(results)?results.map(({state})=>({state})):results}));
+      return;
+    }
+    if(event.cron!==dailyCron)throw new Error("Unknown scheduled job");
     const report = await runDailySync(env.DB, {
       reviews: parseReviews(reviewData), trigger: "scheduled",
       runId: `scheduled:${event.cron}:${event.scheduledTime}`,

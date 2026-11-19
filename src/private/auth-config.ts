@@ -1,4 +1,4 @@
-import { resendConfig, type EmailEnvironment, type ResendConfig } from "../email/config.ts";
+import { accountEmailConfig, resendConfig, type EmailEnvironment, type ResendConfig } from "../email/config.ts";
 import { createHash } from "node:crypto";
 import type { SessionPolicy } from "./session.ts";
 
@@ -12,6 +12,7 @@ export type ProviderConfig = {
   policy: SessionPolicy;
   emailCapture?: boolean;
   emailLive?: ResendConfig;
+  addressDelivery?: ResendConfig|null;
 };
 export type AuthConfig = ProviderConfig | { mode: "demo"; origin: string; policy: SessionPolicy }
   | { mode: "disabled" } | { mode: "unavailable" };
@@ -41,7 +42,17 @@ export function authConfig(env: AuthEnvironment, development: boolean, localOrig
     }
     const realm = createHash("sha256").update(JSON.stringify([issuer, clientId, origin.origin])).digest("hex");
     const live=resendConfig(env);
-    return { ...(mode==="google"&&live&&((!local&&env.EMAIL_SIGNIN_MODE==="live"&&live.publicEnabled)||(local&&env.EMAIL_SIGNIN_MODE==="smoke"&&env.EMAIL_SMOKE_ALLOWED==="true"&&live.ownerAddresses.length))?{emailLive:{...live,ownerOnly:local}}:{}), mode, issuer, clientId, clientSecret, origin: origin.origin, emailCapture: local && env.EMAIL_SIGNIN_MODE === "capture",
+    return { ...(mode==="google"&&live&&((!local&&env.EMAIL_SIGNIN_MODE==="live"&&live.publicEnabled)||(local&&env.EMAIL_SIGNIN_MODE==="smoke"&&env.EMAIL_SMOKE_ALLOWED==="true"&&live.ownerAddresses.length))?{emailLive:{...live,ownerOnly:local}}:{}),
+      ...(env.EMAIL_ADDRESS_MODE!==undefined?{addressDelivery:mode==="google"?accountEmailConfig(env,"address"):null}:{}),
+      mode, issuer, clientId, clientSecret, origin: origin.origin, emailCapture: local && env.EMAIL_SIGNIN_MODE === "capture",
       policy: { mode: "provider", realm, secure: !local } };
   } catch { return { mode: "unavailable" }; }
+}
+
+export function codeTransport(config:ProviderConfig,purpose:"signin"|"reminder-address"){
+  return purpose==="reminder-address"&&config.addressDelivery!==undefined?config.addressDelivery??undefined:config.emailLive;
+}
+export function accountTransport(config:ProviderConfig,user:string){
+  const transport=codeTransport(config,"reminder-address");
+  return transport?.ownerOnly&&transport.ownerUserIds&&!transport.ownerUserIds.includes(user)?undefined:transport;
 }

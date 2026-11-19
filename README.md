@@ -4,7 +4,7 @@ A local catalog for Moroccan hackathons and international events with an online 
 
 ## Production launch
 
-The Worker, assets, dedicated production D1 and daily discovery Cron are deployed. Public reachability at `hackathons.ouahad.space` is pending the DNS cutover; nameservers have not been changed. The launch catalog has three reviewed real entries with AR/FR/EN summaries. Public email remains disabled.
+The Worker, assets, dedicated production D1 and daily discovery Cron are live at [hackathons.ouahad.space](https://hackathons.ouahad.space). The launch catalog has three reviewed real entries with AR/FR/EN summaries. Signed-in Google users can verify a delivery address and opt into accepted-stage reminders through Resend. Email-code sign-in remains disabled. See [the production email rollout](docs/production-email-rollout.md) for the real mailbox checks, independent schedules and operational commands.
 
 See [the launch guide](docs/launch.md) for exact PowerShell commands, current verification, official launch evidence, six active discovery sources, the DNS-preserving move, Google setup and remaining production checks. Builds require Node 24.22.0 or a supported newer release; use `npm.cmd ci`, `npm.cmd run test:production`, and `npm.cmd run build`. Normal local previews retain their existing stores; the built Worker preview uses a separate store.
 
@@ -29,7 +29,9 @@ To preview an already migrated store directly, set `$env:OUAHAD_D1_PATH` to its 
 
 The agenda uses the Ouahad Space visual system and offers English (the default), French (`?lang=fr`), and Arabic (`?lang=ar`). Language switches retain the listing or active filters. Search and filter values live in the URL, applied filters can be removed individually, and the detail page’s return link restores the same result view. Arabic pages use RTL with isolated official names and source text. Official names, field names, cities, and organizer notes remain as published; interface copy and dates are localized. Date-only values never acquire a time.
 
-## Private My Hackathons — local testing only
+## Private My Hackathons
+
+Production uses Google sign-in. Address verification never creates or merges an account, and reminders remain off until that account verifies an address and explicitly opts in. Local code and reminder outboxes remain development tools and are unavailable in production. The phase descriptions below record their original implementation scope; the [production rollout guide](docs/production-email-rollout.md) supersedes their delivery status.
 
 Phase 7A prepares a default-disabled Resend adapter for live codes, address verification and accepted-stage reminders. Google and the local outboxes are preserved. See [sender setup, owner-only smoke commands, secrets, budgets and verification](docs/phase7a.md). No live email, DNS change, external account, billing change or deployment was performed.
 

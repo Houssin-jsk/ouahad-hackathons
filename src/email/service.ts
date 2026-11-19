@@ -23,13 +23,21 @@ export async function authorizeTransactionalEmail(db:Database,row:Delivery,envel
       WHERE d.id=e.catalog_id AND d.publication_state='published' AND d.approved_revision_id=?)))`)
     .bind(plan.id,row.user_id,plan.version,row.generation,guard.settingsVersion,envelope.mail.to[0]!,guard.intent,guard.facts,guard.catalogId,guard.catalogId,guard.approvedRevision).first());
 }
+async function rolloutAllows(db:Database,config:ResendConfig,row:Delivery,envelope:Envelope){
+  if(config.allowedKinds&&!config.allowedKinds.includes(row.kind))return false;
+  if(config.ownerOnly&&(!envelope.mail.to.every(address=>config.ownerAddresses.includes(address))
+    ||config.ownerUserIds&&(!row.user_id||!config.ownerUserIds.includes(row.user_id))))return false;
+  return !config.googleOnly||Boolean(row.user_id&&await db.prepare("SELECT 1 FROM provider_identities WHERE user_id=? AND issuer='https://accounts.google.com'").bind(row.user_id).first());
+}
 export function dispatchTransactionalEmail(db:Database,config:ResendConfig,id:string,options:{now?:Date;fetcher?:typeof fetch;timeoutMs?:number;beforeAuthorize?:()=>Promise<void>}={}){
-  return attemptDelivery(db,config,id,{...options,authorize:(row,envelope,now)=>config.ownerOnly&&!envelope.mail.to.every((address)=>config.ownerAddresses.includes(address))?Promise.resolve(false):authorizeTransactionalEmail(db,row,envelope,now)});
+  return attemptDelivery(db,config,id,{...options,authorize:async(row,envelope,now)=>await rolloutAllows(db,config,row,envelope)&&await authorizeTransactionalEmail(db,row,envelope,now)});
 }
 export async function planLiveReminders(db:Database,config:ResendConfig,origin:string,now=new Date(),ownerOnly?:string[]){
   const users=(await db.prepare("SELECT DISTINCT user_id FROM private_stage_progress WHERE decision='accepted' UNION SELECT user_id FROM stage_reminders").all<{user_id:string}>()).results;
   const ids:string[]=[];
   for(const {user_id}of users){
+    if(config.ownerOnly&&config.ownerUserIds&&!config.ownerUserIds.includes(user_id))continue;
+    if(config.googleOnly&&!await db.prepare("SELECT 1 FROM provider_identities WHERE user_id=? AND issuer='https://accounts.google.com'").bind(user_id).first())continue;
     const context=await reconcileUserReminders(db,user_id,now,"resend");
     for(const row of context.rows){
       if(row.state!=="pending"||!row.due_at||row.due_at>now.toISOString()||!row.expires_at||row.expires_at<=now.toISOString())continue;
@@ -48,6 +56,7 @@ export async function runTransactionalEmailJob(db:Database,config:ResendConfig,{
   if(reminders)await planLiveReminders(db,config,origin,now);
   const rows=(await db.prepare("SELECT id FROM email_deliveries WHERE state IN ('queued','retry_wait','quota_wait','sending') AND next_attempt_at<=? ORDER BY CASE WHEN kind='reminder' THEN 1 ELSE 0 END,created_at,id LIMIT ?").bind(now.toISOString(),Math.min(20,limit)).all<{id:string}>()).results;
   const results=[];for(const row of rows){
+    if(config.allowedKinds){const kind=await db.prepare("SELECT kind FROM email_deliveries WHERE id=?").bind(row.id).first<Delivery["kind"]>("kind");if(!kind||!config.allowedKinds.includes(kind))continue;}
     if(config.ownerOnly){const cipher=await db.prepare("SELECT encrypted_payload FROM email_deliveries WHERE id=?").bind(row.id).first<string>("encrypted_payload");if(!cipher)continue;try{const mail=unseal<Envelope>(cipher,config.encryptionKey,row.id).mail;if(!mail.to.every((address)=>config.ownerAddresses.includes(address)))continue;}catch{continue;}}
     const pace=await db.prepare("SELECT next_request_at,blocked_until FROM email_transport_state WHERE id=1").first<{next_request_at:string|null;blocked_until:string|null}>();
     const current=clock(),delay=pace?.next_request_at?Date.parse(pace.next_request_at)-current.getTime():0;

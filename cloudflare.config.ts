@@ -1,5 +1,6 @@
 import { bindings, defineConfig, triggers } from "cf/config";
 import { dailyCron, syncCompatibilityDate } from "./src/sync-schedule.ts";
+import { reminderCron } from "./src/reminder-schedule.ts";
 
 // Production resources are explicit. Local Node previews continue using their separate Miniflare store.
 export default defineConfig({
@@ -18,16 +19,20 @@ export default defineConfig({
       AUTH_ORIGIN: bindings.text("https://hackathons.ouahad.space"),
       GOOGLE_CLIENT_ID: bindings.secret(),
       GOOGLE_CLIENT_SECRET: bindings.secret(),
-      EMAIL_DELIVERY_MODE: bindings.text("disabled"),
+      EMAIL_DELIVERY_MODE: bindings.text("resend"),
       EMAIL_SIGNIN_MODE: bindings.text("disabled"),
-      EMAIL_PUBLIC_ENABLED: bindings.text("false"),
-      EMAIL_MAILBOX_TEST_VERIFIED: bindings.text("false"),
+      EMAIL_ADDRESS_MODE: bindings.text("public"),
+      EMAIL_REMINDER_MODE: bindings.text("public"),
+      EMAIL_PUBLIC_ENABLED: bindings.text("true"),
+      EMAIL_MAILBOX_TEST_VERIFIED: bindings.text("true"),
       EMAIL_FROM: bindings.text("Ouahad Hackathons <no-reply@notify.ouahad.space>"),
-      // Resend secrets are deliberately absent from this catalog launch. The local owner smoke
-      // flow still reads its ignored env file. Production email requires a separate rollout.
+      RESEND_API_KEY: bindings.secret(),
+      EMAIL_ENCRYPTION_KEY: bindings.secret(),
+      EMAIL_OWNER_ADDRESSES: bindings.secret(),
+      EMAIL_OWNER_USER_IDS: bindings.secret(),
     },
     assets: { runWorkerFirst: true, notFoundHandling: "none" },
-    triggers: [triggers.scheduled({ schedule: dailyCron })],
+    triggers: [triggers.scheduled({ schedule: dailyCron }),triggers.scheduled({ schedule: reminderCron })],
     observability: { enabled: true, traces: { enabled: true } },
   },
 });

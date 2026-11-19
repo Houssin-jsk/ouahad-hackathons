@@ -2,8 +2,10 @@ import { z } from "zod";
 export type EmailEnvironment={
   EMAIL_DELIVERY_MODE?:string; EMAIL_PUBLIC_ENABLED?:string; EMAIL_MAILBOX_TEST_VERIFIED?:string;
   EMAIL_FROM?:string; RESEND_API_KEY?:string; EMAIL_ENCRYPTION_KEY?:string; EMAIL_OWNER_ADDRESSES?:string; EMAIL_SMOKE_ALLOWED?:string;
+  EMAIL_ADDRESS_MODE?:string; EMAIL_REMINDER_MODE?:string; EMAIL_OWNER_USER_IDS?:string;
 };
-export type ResendConfig={mode:"resend";apiKey:string;encryptionKey:string;from:string;publicEnabled:boolean;ownerAddresses:string[];ownerOnly?:boolean};
+export type ResendConfig={mode:"resend";apiKey:string;encryptionKey:string;from:string;publicEnabled:boolean;ownerAddresses:string[];ownerOnly?:boolean;
+  ownerUserIds?:string[];googleOnly?:boolean;allowedKinds?:("signin"|"reminder-address"|"reminder")[]};
 export function resendConfig(env:EmailEnvironment):ResendConfig|null{
   if(env.EMAIL_DELIVERY_MODE!=="resend")return null;
   try{
@@ -15,4 +17,15 @@ export function resendConfig(env:EmailEnvironment):ResendConfig|null{
     return {mode:"resend",apiKey:env.RESEND_API_KEY!,encryptionKey:env.EMAIL_ENCRYPTION_KEY!,from,
       publicEnabled:env.EMAIL_PUBLIC_ENABLED==="true"&&env.EMAIL_MAILBOX_TEST_VERIFIED==="true",ownerAddresses};
   }catch{return null;}
+}
+
+// Address verification and reminder delivery have their own rollout gates. Neither enables login.
+export function accountEmailConfig(env:EmailEnvironment,kind:"address"|"reminder"):ResendConfig|null{
+  const mode=kind==="address"?env.EMAIL_ADDRESS_MODE:env.EMAIL_REMINDER_MODE;
+  const config=resendConfig(env);if(!config)return null;
+  if(mode==="public"&&config.publicEnabled)return {...config,ownerOnly:false,googleOnly:true,allowedKinds:["reminder-address","reminder"]};
+  if(mode!=="owner")return null;
+  const users=(env.EMAIL_OWNER_USER_IDS??"").split(",").map(value=>value.trim()).filter(Boolean);
+  if(!config.ownerAddresses.length||!users.length||users.some(value=>!/^usr_[\w-]+$/.test(value)))return null;
+  return {...config,ownerOnly:true,ownerUserIds:users,googleOnly:true,allowedKinds:["reminder-address","reminder"]};
 }

@@ -18,8 +18,8 @@ export function emailSettingsPage(context:ReminderContext,session:Session,lang:L
       <form class="private-form" method="post" action="${privateHref('/my/email-settings',lang)}">${csrf(session)}
       <label class="check"><input type="checkbox" name="enabled" value="1"${settings.reminders_enabled&&verified?' checked':''}${!verified?' disabled':''}>${html(t.enable)}</label>
       <label>${html(t.language)}<select name="language" aria-label="${html(t.language)}">${[['en','English'],['fr','Français'],['ar','العربية']].map(([value,label])=>`<option value="${value}"${value===settings.language?' selected':''}>${label}</option>`).join('')}</select></label>
-      <button class="btn btn-primary">${icon('check')}${html(t.save)}</button></form><p class="help">${html(t.timing)}</p><p class="local-notice">${html(context.liveAvailable?d.live:context.captureAvailable?t.local:t.unavailable)}</p>
-      <a class="ordinary-link" href="${privateHref('/my/notifications',lang)}">${icon('mail')}${html(context.liveAvailable?d.history:t.notifications)}</a></section>
+      <button class="btn btn-primary">${icon('check')}${html(t.save)}</button></form><p class="help">${html(t.timing)}</p><p class="local-notice">${html(context.liveAvailable?(context.ownerOnly?d.ownerOnly:d.live):context.captureAvailable?t.local:t.unavailable)}</p>
+      ${context.liveAvailable||context.captureAvailable?`<a class="ordinary-link" href="${privateHref('/my/notifications',lang)}">${icon('mail')}${html(context.liveAvailable?d.history:t.notifications)}</a>`:''}</section>
       <section class="editor-surface"><h2>${html(t.verify)}</h2><p class="help">${html(t.verifyHelp)}</p>
       ${context.captureAvailable||context.liveAvailable?`<form class="private-form" method="post" action="${privateHref('/my/email-settings/address',lang)}">${csrf(session)}<label>${html(t.address)}<input name="email" type="email" required maxlength="254" dir="ltr" autocomplete="email"></label><button class="btn btn-secondary">${icon('mail')}${html(t.verify)}</button></form>`:`<p>${html(t.unavailable)}</p>`}</section></div>`,lang,'/my/email-settings',session);
 }

@@ -13,7 +13,7 @@ type Guard={settingsVersion:number;facts:string;intent:string;catalogId:string|n
 type Payload={title:string;stage:string;start:string|null;end:string|null;zone:string|null;recipient:string|null;language:ReminderLanguage};
 export type StageReminder={id:string;user_id:string;entry_id:string;stage_key:string;schedule_hash:string;generation:number;kind:"reminder"|"schedule-change";due_at:string|null;expires_at:string|null;state:"pending"|"cancelled"|"captured"|"waiting";reason:string|null;payload:string;guard:string;version:number;updated_at:string};
 export type ReminderMessage={id:string;reminder_id:string;generation:number;user_id:string;kind:"reminder"|"schedule-change";recipient:string;subject:string;body:string;language:ReminderLanguage;captured_at:string};
-export type ReminderContext={settings:EmailSettings;rows:StageReminder[];messages:ReminderMessage[];captureAvailable:boolean;liveAvailable?:boolean;deliveries?:Delivery[]};
+export type ReminderContext={ownerOnly?:boolean;settings:EmailSettings;rows:StageReminder[];messages:ReminderMessage[];captureAvailable:boolean;liveAvailable?:boolean;deliveries?:Delivery[]};
 
 export async function getEmailSettings(db:Database,user:string,now=new Date(),language:ReminderLanguage="en"){
   // Only this internal identity's verified email can seed an address. Never match Google names or email strings.

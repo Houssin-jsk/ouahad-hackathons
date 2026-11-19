@@ -12,6 +12,7 @@ import { addExternal, changeExternalStage, privateEntries, saveCatalog, updatePr
 import { DateControlError, parseStageForm, stageFormNames } from "../private/stage-form.ts";
 import { requestEmailCode, verifyEmailCode, emailChallenge, capturedCode, consumeEmailCode } from "../private/email-codes.ts";
 import { cookie, findSession, identities, newSession, validCsrf, type Session } from "../private/session.ts";
+import { accountTransport } from "../private/auth-config.ts";
 import type { AuthConfig } from "../private/auth-config.ts";
 import { beginSignIn, callbackPath, clearTransactionCookie, completeSignIn, consumeTransaction, safeReturn } from "../private/oidc.ts";
 import { languageOf } from "./i18n.ts";
@@ -174,10 +175,12 @@ export function privateRoutes(db: Database, now: () => Date, getConfig: () => Au
         return response;
       }
       const user = session.user_id;
-      const captureAvailable:boolean|"resend" = config.mode!=="demo"&&config.emailLive?"resend":config.mode !== "demo" && Boolean(config.emailCapture) && !config.policy.secure;
+      let addressDelivery=config.mode!=="demo"?accountTransport(config,user):undefined;
+      if(addressDelivery?.googleOnly&&!await db.prepare("SELECT 1 FROM provider_identities WHERE user_id=? AND issuer='https://accounts.google.com'").bind(user).first())addressDelivery=undefined;
+      const captureAvailable:boolean|"resend" = addressDelivery?"resend":config.mode !== "demo" && Boolean(config.emailCapture) && !config.policy.secure;
       if(path === "/my/email-settings" || path.startsWith("/my/email-settings/") || path === "/my/notifications" || path.startsWith("/my/notifications/")) {
         const r=reminderText[lang];
-        const context=()=>reconcileUserReminders(db,user,now(),captureAvailable,lang);
+        const context=async()=>({...await reconcileUserReminders(db,user,now(),captureAvailable,lang),ownerOnly:addressDelivery?.ownerOnly});
         if(path === "/my/email-settings" && method !== "POST")send(200,emailSettingsPage(await context(),session,lang,url.searchParams.has("verified")?r.addressVerified:url.searchParams.has("saved")?r.saved:undefined));
         else if(path === "/my/email-settings" && method === "POST"){
           only(data!,["enabled","language"]);
@@ -192,24 +195,25 @@ export function privateRoutes(db: Database, now: () => Date, getConfig: () => Au
             const requested=await requestEmailCode(db,config,session,data!.get("email")??"","/my/email-settings",now(),"reminder-address",lang);
             if(requested.status==="limited")send(429,emailSettingsPage(await context(),session,lang,r.limited));
             else redirect("/my/email-settings/code?challenge="+requested.id);
-          }catch(error){if(error instanceof ZodError)send(400,emailSettingsPage(await context(),session,lang,t.invalid));else throw error;}
+          }catch(error){if(error instanceof ZodError)send(400,emailSettingsPage(await context(),session,lang,t.invalid));else if(error instanceof Error&&error.message==="Owner-controlled address required")send(403,emailSettingsPage(await context(),session,lang,deliveryText[lang].ownerOnly));else throw error;}
         }else if(["/my/email-settings/code","/my/email-settings/code-outbox"].includes(path)&&method!=="POST"){
           if(!captureAvailable||captureAvailable==="resend"&&path.endsWith("code-outbox"))throw new RequestError(404,"notFoundCopy");
           const id=url.searchParams.get("challenge")??"",challenge=await emailChallenge(db,session,id,now(),false,"reminder-address",captureAvailable==="resend"?"resend":"capture");
           if(!challenge)throw new RequestError(404,"notFoundCopy");
           const message=path.endsWith("code-outbox")?await capturedCode(db,session,id,now(),"reminder-address"):null;
           let state:string|undefined;
-          if(config.mode!=="demo"&&config.emailLive){const job=await db.prepare("SELECT id FROM email_deliveries WHERE challenge_id=? AND user_id=? AND kind='reminder-address'").bind(id,user).first<string>("id");if(job){await dispatchTransactionalEmail(db,config.emailLive,job,{now:now()});state=(await deliveryStatus(db,job))?.state??"failed";}else state="failed";}
+          if(addressDelivery){const job=await db.prepare("SELECT id FROM email_deliveries WHERE challenge_id=? AND user_id=? AND kind='reminder-address'").bind(id,user).first<string>("id");if(job){await dispatchTransactionalEmail(db,addressDelivery,job,{now:now()});state=(await deliveryStatus(db,job))?.state??"failed";}else state="failed";}
           send(200,deliveryCodePage(challenge,session,lang,false,message?.code,state));
         }else if(path === "/my/email-settings/verify"&&method==="POST"){
           only(data!,["challenge","code"]);
           if(config.mode === "demo" || !captureAvailable)throw new RequestError(404,"notFoundCopy");
           const id=data!.get("challenge")??"",verified=await consumeEmailCode(db,config,session,id,data!.get("code")??"",now(),"reminder-address");
-          if(verified){await setVerifiedReminderAddress(db,user,verified.email,now(),config.emailLive?"resend":"capture");await context();redirect("/my/email-settings?verified=1");}
-          else{const challenge=await emailChallenge(db,session,id,now(),false,"reminder-address",captureAvailable==="resend"?"resend":"capture");if(challenge)send(400,deliveryCodePage(challenge,session,lang,true,undefined,config.emailLive?"retry_wait":undefined));else send(400,emailSettingsPage(await context(),session,lang,r.codeFailed));}
+          if(verified){await setVerifiedReminderAddress(db,user,verified.email,now(),addressDelivery?"resend":"capture");await context();redirect("/my/email-settings?verified=1");}
+          else{const challenge=await emailChallenge(db,session,id,now(),false,"reminder-address",captureAvailable==="resend"?"resend":"capture");if(challenge)send(400,deliveryCodePage(challenge,session,lang,true,undefined,addressDelivery?"retry_wait":undefined));else send(400,emailSettingsPage(await context(),session,lang,r.codeFailed));}
         }else if(method!=="POST"&&/^\/my\/notifications(?:\/[a-f0-9]{64})?$/.test(path)){
           const id=path.split("/")[3];
           if(captureAvailable==="resend"){const deliveries=(await ownerDeliveries(db,user)).filter((item)=>!id||item.id===id);if(id&&!deliveries.length)throw new RequestError(404,"notFoundCopy");send(200,liveDeliveryPage(deliveries,session,lang));return response;}
+          if(config.policy.secure)throw new RequestError(404,"notFoundCopy");
           const messages=await reminderMessages(db,user,id);
           if(id&&!messages.length)throw new RequestError(404,"notFoundCopy");
           send(200,reminderOutboxPage(messages,session,lang,Boolean(id)));
