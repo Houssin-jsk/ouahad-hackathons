@@ -1,4 +1,5 @@
 import { deliveryText } from "../email/copy.ts";
+import { reminderHtml } from "../email/templates.ts";
 import { ownerDeliveries, type Delivery } from "../email/queue.ts";
 import { createHash } from "node:crypto";
 import type { Database } from "../local-d1.ts";
@@ -123,7 +124,9 @@ export function renderReminder(row:StageReminder,origin:string,live=false){
   return {subject:`${row.kind==="schedule-change"?t.changeSubject:t.subject}: ${isolate(p.stage)} — ${isolate(p.title)}`.replace(/[\r\n]+/g," "),
     body:[row.kind==="schedule-change"?(live?deliveryText[p.language].scheduleChange:t.changeCopy):t.acceptedCopy,`${t.opportunity}: ${isolate(p.title)}`,`${t.event}: ${isolate(p.stage)}`,`${t.eventDates}: ${isolate(dates)}`,
       p.start&&!p.start.includes("T")?t.startUnknown:"",p.start?.includes("T")?t.exactPolicy:t.datePolicy,
-      `${t.view}: ${isolate(url.href)}`,`${t.manage}: ${isolate(settings.href)}`,live?"":t.local].filter(Boolean).join("\n\n")};
+      `${t.view}: ${isolate(url.href)}`,`${t.manage}: ${isolate(settings.href)}`,live?"":t.local].filter(Boolean).join("\n\n"),
+    ...(live?{html:reminderHtml({language:p.language,title:p.title,stage:p.stage,start:p.start,end:p.end,
+      changed:row.kind==="schedule-change",notice:row.kind==="schedule-change"?deliveryText[p.language].scheduleChange:t.acceptedCopy,stageUrl:url.href,settingsUrl:settings.href})}:{})};
 }
 
 export async function runReminderJob(db:Database,{now=new Date(),capture=false,origin="http://127.0.0.1:4177",beforeCapture}: {

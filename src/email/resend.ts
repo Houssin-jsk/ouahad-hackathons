@@ -1,5 +1,5 @@
 import type { ResendConfig } from "./config.ts";
-export type Mail={from:string;to:string[];subject:string;text:string};
+export type Mail={from:string;to:string[];subject:string;text:string;html?:string};
 export type SendResult={state:"provider_accepted";providerId:string}|{state:"retry_wait"|"quota_wait"|"failed";code:string;retryAfterSeconds?:number;ambiguous?:boolean};
 export async function sendResend(config:ResendConfig,key:string,mail:Mail,{fetcher=fetch,timeoutMs=8000}:{fetcher?:typeof fetch;timeoutMs?:number}={}):Promise<SendResult>{
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);

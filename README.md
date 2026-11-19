@@ -8,6 +8,8 @@ The Worker, assets, dedicated production D1 and daily discovery Cron are live at
 
 See [the launch guide](docs/launch.md) for exact PowerShell commands, current verification, official launch evidence, six active discovery sources, the DNS-preserving move, Google setup and remaining production checks. Builds require Node 24.22.0 or a supported newer release; use `npm.cmd ci`, `npm.cmd run test:production`, and `npm.cmd run build`. Normal local previews retain their existing stores; the built Worker preview uses a separate store.
 
+The [transactional email design review](docs/email-design.md) adds local EN/FR/AR HTML previews with unchanged plain-text fallbacks and immutable queued payloads. It has not been deployed or used to send live email.
+
 ## Browser previews
 
 From the workspace root, with Node.js 24 or newer:

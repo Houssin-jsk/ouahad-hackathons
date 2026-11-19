@@ -43,7 +43,7 @@ export async function planLiveReminders(db:Database,config:ResendConfig,origin:s
       if(row.state!=="pending"||!row.due_at||row.due_at>now.toISOString()||!row.expires_at||row.expires_at<=now.toISOString())continue;
       const payload=JSON.parse(row.payload) as {recipient:string};if((ownerOnly&&!ownerOnly.includes(payload.recipient))||(config.ownerOnly&&!config.ownerAddresses.includes(payload.recipient)))continue;
       const rendered=renderReminder(row,origin,true);
-      ids.push(await enqueueEmail(db,config,"reminder",emailId([row.id,row.generation,row.payload]),{to:[payload.recipient],subject:rendered.subject,text:rendered.body},new Date(row.expires_at),now,{user:user_id,reminder:row.id,generation:row.generation,reminderPayload:row.payload}));
+      ids.push(await enqueueEmail(db,config,"reminder",emailId([row.id,row.generation,row.payload]),{to:[payload.recipient],subject:rendered.subject,text:rendered.body,html:rendered.html},new Date(row.expires_at),now,{user:user_id,reminder:row.id,generation:row.generation,reminderPayload:row.payload}));
     }
   }
   return ids;
