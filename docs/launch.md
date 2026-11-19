@@ -4,6 +4,8 @@ The Worker `ouahad-hackathons` is deployed to Cloudflare, with its own productio
 
 The main portfolio's existing DNS targets were preserved in the inactive zone with proxy off. The existing main site remains on its original host; the hackathons application uses Workers only. The zone is on the Free plan. No billing upgrade or email send was performed.
 
+Deployment evidence: Worker version `12710e9c-ea97-48de-a0df-36ceb117b812`; upload, custom-domain attachment and `0 6 * * *` trigger all completed successfully. The live six-source owner discovery run is `20be281a-1096-4284-bc8c-7ecf4894f150`. An external HTTPS request still fails DNS resolution (`ENOTFOUND`) before the nameserver cutover.
+
 ## Build and verification
 
 Use **Node 24.22.0** (`.node-version`), or a supported newer version listed in `package.json`. The machine's older Node 24.15.0 has IANA tzdata 2026a; Node 24.22.0 has 2026c. Morocco's legal-time update is described by the [government](https://www.cg.gov.ma/en/node/13036) and the [IANA maintainer](https://lists.iana.org/hyperkitty/list/tz%40iana.org/message/7NCXIR252EF7HEZMD7ZGWBEER4RNPZDI/). Five core tests and two browser checks assumed the older Morocco offset. Their assertions now test civil-day boundaries, round trips and Morocco-formatted instants using the named zone. Scheduling code still uses `Intl` and `Africa/Casablanca`; no fixed Morocco offset was introduced.

@@ -7,4 +7,3 @@ export default defineWranglerConfig({
   uploadSourceMaps: true,
   types: { generate: true, includeRuntime: false },
 });
-

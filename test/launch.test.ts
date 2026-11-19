@@ -68,4 +68,3 @@ test("launch file imports as reviewed drafts; multilingual edits cannot change a
   assert.equal((await publicCatalog(db, "archive", { now }))[0]?.id, "hcp-tta:datathon-data-territoires-2026");
   assert.equal((await db.prepare("SELECT count(*) AS n FROM private_users").first())?.n, 0);
 });
-
