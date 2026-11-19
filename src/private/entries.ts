@@ -19,13 +19,13 @@ export const stageInput = z.strictObject({
   requiresStage: z.string().max(100).nullable(),
   fixedAttendance: z.boolean(),
 }).superRefine((row, ctx) => {
-  if (row.entry === "advancement" && !row.requiresStage) ctx.addIssue({ code: "custom", message: "Choose a prerequisite stage" });
-  if (row.entry === "direct" && row.requiresStage) ctx.addIssue({ code: "custom", message: "Direct entry cannot require a stage" });
+  if (row.entry === "advancement" && !row.requiresStage) ctx.addIssue({ code: "custom", path: ["requiresStage"], message: "Choose a prerequisite stage" });
+  if (row.entry === "direct" && row.requiresStage) ctx.addIssue({ code: "custom", path: ["requiresStage"], message: "Direct entry cannot require a stage" });
   const { eventStart: start, eventEnd: end } = row;
   if (start && end) {
     const day = (v: string) => v.includes("T") && row.timeZone ? dateAt(new Date(v), row.timeZone) : v.slice(0, 10);
     const reversed = start.includes("T") && end.includes("T") ? Date.parse(start) >= Date.parse(end) : day(start) > day(end);
-    if (reversed) ctx.addIssue({ code: "custom", message: "End must follow the start" });
+    if (reversed) ctx.addIssue({ code: "custom", path: ["eventEnd"], message: "End must follow the start" });
   }
 });
 export const externalInput = z.strictObject({

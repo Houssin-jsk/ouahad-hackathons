@@ -4,6 +4,7 @@ import { dispatchTransactionalEmail } from "../email/service.ts";
 import { reconcileUserReminders, reminderMessages, setReminderPreferences, setVerifiedReminderAddress } from "../private/reminders.ts";
 import { emailSettingsPage, deliveryCodePage, reminderOutboxPage, liveDeliveryPage } from "./reminder-pages.ts";
 import { reminderText } from "../private/reminder-copy.ts";
+import { createFormErrors, parseExternalForm } from "../private/external-form.ts";
 import { ZodError } from "zod";
 import type { Database } from "../local-d1.ts";
 import { publicCatalog } from "../catalog-read.ts";
@@ -226,9 +227,17 @@ export function privateRoutes(db: Database, now: () => Date, getConfig: () => Au
       } else if (path === "/my/new") {
         if (method === "POST") {
           only(data!, ["title", "domain", "eventUrl", ...stageNames]);
-          const id = await addExternal(db, user, {
-            title: data!.get("title"), domain: data!.get("domain"), eventUrl: data!.get("eventUrl") || null, stage: stageData(data!),
-          }, now());
+          let input;
+          try { input = parseExternalForm(data!); }
+          catch (error) {
+            if (!(error instanceof ZodError) && !(error instanceof DateControlError)) throw error;
+            const errors = createFormErrors(error);
+            // Diagnostic reason codes only: no account IDs, submitted values, tokens or exceptions.
+            console.warn(JSON.stringify({ type: "private-create-validation", errors }));
+            send(400, externalPage(session, lang, data!, errors));
+            return response;
+          }
+          const id = await addExternal(db, user, input, now());
           redirect(`/my/entries/${id}`);
         } else send(200, externalPage(session, lang));
       } else if (path === "/my/save") {

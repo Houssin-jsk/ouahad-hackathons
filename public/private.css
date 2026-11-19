@@ -38,3 +38,5 @@
 .notification-list h2{font-size:1.4rem}.notification-list h2 a{color:inherit}
 .reminder-message{white-space:pre-wrap;font:inherit;line-height:1.8;overflow-wrap:anywhere;border-block-start:1px solid #d5d1c8;padding-block-start:1rem}
 @media(max-width:700px){.email-settings-grid{grid-template-columns:1fr}.account-tools{margin-block:0 1rem}.reminder-status{font-size:.82rem}}
+
+.form-errors{max-width:850px;margin-inline:auto;padding:1.2rem;border:1px solid var(--amber);border-inline-start-width:4px;background:#fff7e8}.form-errors h2{font-size:1.4rem}.form-errors ul{padding-inline-start:1.2rem;margin-block-start:.7rem}.form-errors a{color:var(--ink);text-decoration:underline}.field-error{color:#8b381d;line-height:1.5}.private-shell [aria-invalid=true]{border-color:#a54420;border-width:2px}
