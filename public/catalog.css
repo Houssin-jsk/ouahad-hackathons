@@ -259,3 +259,45 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.45; stroke-linecap: roun
 @media(max-width:48rem){.brand-lockup{position:relative;display:block;min-height:56px}.brand-lockup .brand{min-height:56px;align-items:start;font-size:10px;gap:8px}.brand-lockup .brand img{width:40px;height:40px;margin-top:5px}.brand-lockup .brand>span{padding-top:3px}.brand-lockup .brand-section{position:absolute;inset-inline-start:48px;bottom:0;min-height:24px;padding:0;border:0;font-size:19px;line-height:24px;margin:0}.language-control{max-width:100%}}
 
 .public-view button.open-toggle{border:0;background:transparent;cursor:pointer;font-family:inherit}
+
+/* Mobile agenda refinement. Desktop arrangement and the approved type scale stay intact. */
+.mobile-sort,.mobile-audience{display:none}
+.public-view .agenda-row .row-main{display:flex;flex-direction:column}
+.public-view .agenda-row .card-route{order:-1}
+@media(max-width:48rem){
+ .public-view .intro-line h1{min-width:0;overflow-wrap:anywhere}
+ .public-view .directory .audiences{justify-content:space-between;gap:0 8px;margin-bottom:16px}
+ .public-view .directory .audiences a{white-space:normal;max-width:100%;padding-inline:0;min-width:44px;min-height:48px}
+ .public-view .directory .desktop-audience{display:none}
+ .public-view .directory .mobile-audience{display:inline}
+ .public-view .directory .filter-form{gap:8px;padding-block:0 16px}
+ .public-view .directory .searchbar{min-width:0}
+ .public-view .directory .search-input{min-width:0}
+ .public-view .directory .search-submit{padding-inline:12px;gap:8px}
+ .public-view .directory .search-submit .catalog-icon{display:none}
+ .public-view .directory .open-toggle{min-height:48px;white-space:normal;line-height:1.5;padding-block:4px}
+ .public-view .directory .filter-panel>summary{min-height:48px;padding-inline:12px;gap:8px}
+ .public-view .directory .filter-fields{margin-top:0;gap:16px;padding:16px}
+ .public-view .directory .applied{padding-block:0 16px;gap:8px}
+ .public-view .directory .results-head{display:grid;grid-template-columns:minmax(0,1fr);gap:0;min-height:0;padding-block:12px 8px}
+ .public-view .directory .results-head>p{min-height:0;line-height:1.65;padding-block:0 4px}
+ .public-view .directory .sort-form{display:none}
+ .public-view .directory .mobile-sort{display:block;min-width:0;margin:0}
+ .public-view .directory .mobile-sort fieldset{display:flex;align-items:center;flex-wrap:wrap;gap:4px 16px;min-width:0;border:0;padding:0;margin:0}
+ .public-view .directory .mobile-sort legend{float:inline-start;margin:0 12px 0 0;padding:0;min-height:44px;align-content:center;font:500 .9375rem/1.5 var(--public-reading);color:var(--muted)}
+ [dir=rtl] .public-view .directory .mobile-sort legend{margin-inline:0 12px}
+ .public-view .directory .mobile-sort button{min-height:44px;max-width:100%;min-width:0;background:transparent;border:0;border-bottom:2px solid transparent;border-radius:0;padding:8px 0;cursor:pointer;font:500 .9375rem/1.5 var(--public-reading);color:var(--muted);text-align:start;overflow-wrap:anywhere}
+ .public-view .directory .mobile-sort button[aria-pressed=true]{color:var(--ink);border-bottom-color:var(--green);font-weight:600}
+ .public-view .directory .mobile-sort button:hover{color:var(--green)}
+ .public-view .directory .agenda-row{padding-block:24px 28px;padding-inline-start:18px;gap:16px}
+ .public-view .directory .agenda-row::before{top:33px}
+ .public-view .directory .card h3{margin-block:0 8px;line-height:1.4}
+ .public-view .directory .card-details{padding-block:3px}
+ .public-view .directory .card-place{margin-top:0;line-height:1.65}
+ .public-view .directory .card-route{order:0;text-transform:none;font-weight:400;line-height:1.5;margin-block:2px 0}
+ .public-view .directory .row-status{margin-top:12px}
+ .public-view .directory .badge{font-weight:500;line-height:1.6}
+ .public-view .directory .row-cutoff{padding-top:0}
+ .public-view .directory .row-cutoff dt{margin-bottom:2px}
+ .public-view .directory .row-cutoff dd{line-height:1.5}
+}

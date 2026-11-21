@@ -188,9 +188,9 @@ function cutoff(stage:Stage,lang:Language){return stage.registrationDeadline?dat
 function card(entry: PublicListing, context: Context) {
   const {filters,section}=context,lang=filters.lang,t=messages[lang],c=catalogCopy[lang],stage=stageFor(entry,filters);
   return `<article class="card agenda-row" aria-label="${html(entry.title)}">
-    <div class="row-main"><p class="card-route">${labels(lang)[stage.category]}</p>
-      <h3><a class="card-details" href="${html(detailHref(entry.id,filters,section))}" aria-label="${t.details}: ${html(entry.title)}">${published(entry.title)}</a></h3>
+    <div class="row-main"><h3><a class="card-details" href="${html(detailHref(entry.id,filters,section))}" aria-label="${t.details}: ${html(entry.title)}">${published(entry.title)}</a></h3>
       <p class="card-place">${stage.format==="online"?html(onlineCue(stage,lang,entry.evidence.stale&&!entry.archived)):where(stage,lang)}</p>
+      <p class="card-route">${labels(lang)[stage.category]}</p>
       <div class="row-status">${statusBadge(entry,lang)}</div></div>
     <dl class="row-cutoff"><div><dt>${c.deadline}</dt><dd>${cutoff(stage,lang)}</dd></div></dl>
   </article>`;
@@ -267,7 +267,8 @@ export function home(section: Section, entries: PublicListing[], filters: Filter
     ? [["applications-closed", t.closed], ["finished", t.finished]]
     : [["open", t.open], ["unknown", t.unknown], ["eligibility", t.eligibility]];
   const audienceLinks = ([[undefined, t.all], ...Object.entries(labels(lang))] as [Audience | undefined, string][])
-    .map(([audience, label]) => `<a href="${html(location(section, { ...filters, audience }))}"${audience === filters.audience ? ' aria-current="page"' : ""}>${label}</a>`).join("");
+    .map(([audience, label]) => `<a href="${html(location(section, { ...filters, audience }))}"${audience === filters.audience ? ' aria-current="page"' : ""}><span class="desktop-audience">${label}</span><span class="mobile-audience">${audience==="international-online"?c.internationalShort:label}</span></a>`).join("");
+  const sortInputs=Object.entries(filters).filter(([key,value])=>key!=="sort"&&value&&!(key==="lang"&&value==="en")).map(([key,value])=>`<input type="hidden" name="${html(key)}" value="${html(value)}">`).join("");
   const empty = `<section class="empty" aria-label="${t.emptyLabel}"><span class="empty-index" aria-hidden="true">—</span>
     <h3>${hasFilters ? t.noMatches : archive ? t.emptyArchive : t.empty}</h3>
     <p>${hasFilters ? t.noMatchesCopy : archive ? t.emptyArchiveCopy : t.emptyCopy}</p>
@@ -305,8 +306,12 @@ export function home(section: Section, entries: PublicListing[], filters: Filter
       </form>
       ${chips(filters, section)}
       <div class="results-head"><p aria-live="polite"><strong>${matching.length}</strong> ${matching.length===1?t.countOne:t.count}</p>
-        <form class="sort-form" method="get" action="${section}">${Object.entries(filters).filter(([key,value])=>key!=="sort"&&value&&!(key==="lang"&&value==="en")).map(([key,value])=>`<input type="hidden" name="${html(key)}" value="${html(value)}">`).join("")}
-          <label>${c.sort}<select name="sort" aria-label="${c.sort}"><option value="deadline"${filters.sort!=="event"?" selected":""}>${c.deadlineSort}</option><option value="event"${filters.sort==="event"?" selected":""}>${c.eventSort}</option></select></label><button type="submit">${c.sortApply}</button></form></div>
+        <form class="sort-form" method="get" action="${section}">${sortInputs}
+          <label>${c.sort}<select name="sort" aria-label="${c.sort}"><option value="deadline"${filters.sort!=="event"?" selected":""}>${c.deadlineSort}</option><option value="event"${filters.sort==="event"?" selected":""}>${c.eventSort}</option></select></label><button type="submit">${c.sortApply}</button></form>
+        <form class="mobile-sort" method="get" action="${section}" aria-label="${c.sort}">${sortInputs}<fieldset><legend>${c.sort}</legend>
+          <button type="submit" name="sort" value="deadline" aria-label="${c.sort}: ${c.deadlineSort}" aria-pressed="${filters.sort!=="event"}">${c.deadlineShort}</button>
+          <button type="submit" name="sort" value="event" aria-label="${c.sort}: ${c.eventSort}" aria-pressed="${filters.sort==="event"}">${c.eventShort}</button>
+        </fieldset></form></div>
       ${matching.length ? `<div class="cards agenda">${matching.map((entry) => card(entry, { filters, section })).join("")}</div>` : empty}
     </section>`, { filters, section, privateLink });
 }
