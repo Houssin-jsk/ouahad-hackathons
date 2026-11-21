@@ -19,6 +19,8 @@ The comparison uses the same five real announcements, the same local D1 presenta
 
 The only desktop compatibility change is the internal listing flow needed to retain the old visual order after the semantic source-order improvement. Matched 1440px before/after PNGs in all three languages have identical dimensions and zero changed pixels.
 
+The release versions the catalog stylesheet URL so returning browsers do not mix new mobile markup with the previous stylesheet during its ten-minute browser cache lifetime. This does not alter the reviewed layout.
+
 ## Verification
 
 ```powershell

@@ -216,7 +216,7 @@ export function layout(title: string, section: "catalog" | "archive" | "detail",
   return `<!doctype html><html lang="${lang}" dir="${lang === "ar" ? "rtl" : "ltr"}"><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="description" content="${html(t.intro)}">
     <title>${html(title)} · Ouahad Hackathons</title><link rel="icon" href="/icons/app_icon.png">
-    <link rel="stylesheet" href="/catalog.css?v=agenda-2">
+    <link rel="stylesheet" href="/catalog.css?v=mobile-ux-1">
     ${context.pagePath ? '<link rel="stylesheet" href="/private.css">' : ""}
     <link rel="stylesheet" href="/typography.css?v=release-1">
   </head><body class="${context.pagePath?"private-view":"public-view"}"><a class="skip-link" href="#main">${t.skip}</a>
