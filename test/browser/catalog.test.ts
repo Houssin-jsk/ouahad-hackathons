@@ -94,15 +94,15 @@ test("browsing approved editions through the browser and local D1", { timeout: 1
       assert.match(await game.innerText(), /Check eligibility/);
       assert.doesNotMatch(await game.innerText(), /Confirmed open/);
       await capture("catalog-desktop");
-      await page.getByRole("link", { name: "Open registrations", exact: true }).click();
+      await page.getByRole("switch", { name: "Open only", exact: true }).click();
       assert.deepEqual(await titles(), ["Hackathon Open Data 2026"]);
       await page.getByRole("link", { name: "Clear all", exact: true }).click();
       await views.getByRole("link", { name: "International Online" }).click();
       assert.deepEqual(await titles(), ["United Hacks v8"]);
-      assert.match(await page.locator(".card").innerText(), /Application deadline\s+Not published/);
+      assert.match(await page.locator(".card").innerText(), /Application cutoff\s+Cutoff unconfirmed/);
       await views.getByRole("link", { name: "In Morocco" }).click();
       assert.deepEqual(await titles(), ["Hackathon Open Data 2026", "TechNovate Hackathon — Blue Tech"]);
-      await page.locator("summary").click();
+      await page.locator(".filter-panel > summary").click();
       await page.getByRole("searchbox", { name: "Search" }).fill("technovate agadir");
       await page.getByLabel("Field", { exact: true }).selectOption("aquaculture");
       await page.getByLabel("City", { exact: true }).selectOption("Agadir");
@@ -149,11 +149,11 @@ test("browsing approved editions through the browser and local D1", { timeout: 1
     await t.test("mobile viewport has usable filters and no horizontal overflow", async () => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(populated);
-      assert.equal(await page.locator(".cards").evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length), 1);
+      assert.equal(await page.locator(".card").first().evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(" ").length), 1);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
       await capture("catalog-mobile");
       await views.getByRole("link", { name: "International Online" }).click();
-      await page.locator("summary").click();
+      await page.locator(".filter-panel > summary").click();
       await page.getByLabel("Format", { exact: true }).selectOption("online");
       await page.getByRole("button", { name: "Apply filters" }).click();
       assert.deepEqual(await titles(), ["United Hacks v8"]);
@@ -175,7 +175,7 @@ test("browsing approved editions through the browser and local D1", { timeout: 1
             "Hackathon Open Data 2026", "TechNovate Hackathon — Blue Tech", "United Hacks v8", "GitHub Game Off 2026",
           ].sort());
           assert.equal(await page.getByRole("searchbox", { name: t.search, exact: true }).isVisible(), true);
-          assert.equal((await page.locator("summary").innerText()).trim(), t.filters);
+          assert.equal((await page.locator(".filter-panel > summary").innerText()).trim(), t.filters);
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
           await capture(`after-${lang}-${width}`);
           await page.getByRole("link", { name: t.details + ": Hackathon Open Data 2026", exact: true }).click();
@@ -204,13 +204,13 @@ test("browsing approved editions through the browser and local D1", { timeout: 1
     await t.test("URL filters and chips survive listing visits and language switches", async () => {
       await page.goto(populated + "/?q=technovate&city=Agadir&field=aquaculture&format=in-person&status=unknown&audience=morocco");
       assert.deepEqual(await titles(), ["TechNovate Hackathon — Blue Tech"]);
-      assert.equal(await page.locator("details").getAttribute("open"), null);
+      assert.equal(await page.locator(".filter-panel").getAttribute("open"), null);
       assert.equal(await page.locator(".chip").count(), 5);
-      await page.getByRole("link", { name: "Français", exact: true }).click();
+      await page.locator(".language-control > summary").click(); await page.getByRole("link", { name: "Français", exact: true }).click();
       assert.equal(new URL(page.url()).searchParams.get("city"), "Agadir");
       await page.getByRole("link", { name: "Voir les détails: TechNovate Hackathon — Blue Tech", exact: true }).click();
       assert.equal(await page.locator("html").getAttribute("lang"), "fr");
-      await page.getByRole("link", { name: "العربية", exact: true }).click();
+      await page.locator(".language-control > summary").click(); await page.getByRole("link", { name: "العربية", exact: true }).click();
       assert.equal(new URL(page.url()).pathname, listingPath(tech));
       assert.equal(await page.locator(".detail-head h1 bdi").getAttribute("dir"), "auto");
       assert.equal(await page.getByRole("heading", { name: "TechNovate Hackathon — Blue Tech", exact: true }).isVisible(), true);
@@ -229,7 +229,7 @@ test("browsing approved editions through the browser and local D1", { timeout: 1
       assert.equal(new URL(page.url()).searchParams.has("q"), false);
       await page.goto(populated + "/archive?lang=ar&status=finished&audience=international-online");
       await page.getByRole("link", { name: /عرض التفاصيل: NASA/ }).click();
-      await page.getByRole("link", { name: "Français", exact: true }).click();
+      await page.locator(".language-control > summary").click(); await page.getByRole("link", { name: "Français", exact: true }).click();
       await page.getByRole("link", { name: messages.fr.backArchive, exact: true }).click();
       assert.equal(new URL(page.url()).pathname, "/archive");
       assert.equal(new URL(page.url()).searchParams.get("status"), "finished");
@@ -246,14 +246,16 @@ test("browsing approved editions through the browser and local D1", { timeout: 1
       await page.keyboard.press("Tab");
       assert.equal(await page.locator(".search-submit").evaluate((node) => node === document.activeElement), true);
       await page.keyboard.press("Tab");
-      assert.equal(await page.locator("summary").evaluate((node) => node === document.activeElement), true);
+      assert.equal(await page.getByRole("switch").evaluate(node=>node===document.activeElement),true);
+      await page.keyboard.press("Tab");
+      assert.equal(await page.locator(".filter-panel > summary").evaluate((node) => node === document.activeElement), true);
       await page.keyboard.press("Enter");
-      assert.equal(await page.locator("details").getAttribute("open"), "");
+      assert.equal(await page.locator(".filter-panel").getAttribute("open"), "");
       await page.keyboard.press("Tab");
       assert.equal(await page.locator("#filter-field").evaluate((node) => node === document.activeElement), true);
       await page.locator(".chip").focus();
       assert.equal(await page.locator(".chip").evaluate((node) => node === document.activeElement), true);
-      await page.locator("summary").click();
+      await page.locator(".filter-panel > summary").click();
       await page.locator(".card-details").focus();
       await page.keyboard.press("Enter");
       await page.waitForURL((url) => url.pathname === listingPath(tech));

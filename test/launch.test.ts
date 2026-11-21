@@ -45,7 +45,7 @@ test("launch file imports as reviewed drafts; multilingual edits cannot change a
   assert.equal(before[0]?.summaries.ar?.text, row.summaries?.ar?.text);
   const pending = await inspectEdition(db, id);
   assert.equal(pending.pending?.facts.summaries?.ar?.text, updates.summaries.ar.text);
-  const page = await catalogHandler(new Request("https://catalog.example/?lang=ar"), db, { auth: { mode: "disabled" }, now: () => now });
+  const page = await catalogHandler(new Request("https://catalog.example/hackathons/"+encodeURIComponent(id)+"?lang=ar"), db, { auth: { mode: "disabled" }, now: () => now });
   const html = await page.text();
   assert.match(html, /lang="ar" dir="rtl"/);
   assert.ok(html.includes(row.summaries!.ar!.text));

@@ -74,7 +74,7 @@ test("accepted-stage reminders: verify, opt in, reschedule, capture and decline 
  await page.getByRole('link',{name:reminderText.en.captured,exact:true}).click();
  assert.equal(await page.locator('.reminder-message').count(),1);assert.equal(await page.locator('.reminder-message').getAttribute('dir'),'rtl');
  assert.ok((await page.locator('.reminder-message').innerText()).includes(reminderDate('2026-12-02T09:00:00+01:00','ar')));
- await page.getByRole('link',{name:'العربية',exact:true}).click();await shot('outbox-ar-390');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ await page.locator(".language-control > summary").click(); await page.getByRole('link',{name:'العربية',exact:true}).click();await shot('outbox-ar-390');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
  const [message]=await reminderMessages(runtime.db,'usr_google_reminder');assert.ok(message);
  assert.equal((await otherPage.request.get(app.url+'/my/notifications/'+message.id)).status(),404);
  assert.equal((await otherPage.request.get(app.url+'/my/notifications')).status(),200);

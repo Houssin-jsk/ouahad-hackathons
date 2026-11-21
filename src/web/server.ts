@@ -6,7 +6,7 @@ import { authConfig, type AuthEnvironment } from "../private/auth-config.ts";
 import { catalogHandler, publicAssets } from "./catalog-handler.ts";
 
 export async function listenCatalog(db: Database, { port = 4173, now = () => new Date(), developmentAuth = false,
-  authEnvironment = {} as AuthEnvironment } = {}) {
+  authEnvironment = {} as AuthEnvironment, typographyCss = undefined as string | undefined } = {}) {
   await db.prepare("SELECT id FROM editions LIMIT 1").first();
   const development = process.env.NODE_ENV === "development";
   // A production process never turns this Phase 5 boolean into demo auth.
@@ -14,6 +14,8 @@ export async function listenCatalog(db: Database, { port = 4173, now = () => new
   if (env.AUTH_MODE !== "disabled") await db.prepare("SELECT id FROM private_entries LIMIT 1").first();
   const files = new Map(await Promise.all([...publicAssets].map(async ([path, type]) =>
     [path, { type, body: new Uint8Array(await readFile(new URL(`../../public${path}`, import.meta.url))) }] as const)));
+  // Local comparison only: identical routes/data with an alternate stylesheet; Worker uses the default asset.
+  if (typographyCss !== undefined) files.set("/typography.css", { type:"text/css; charset=utf-8", body:new TextEncoder().encode(typographyCss) });
   let origin = "";
   const server = createServer(async (incoming, outgoing) => {
     try {

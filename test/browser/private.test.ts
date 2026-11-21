@@ -77,7 +77,7 @@ test("private browser journey with two accounts, advancement, conflicts, locales
     const official = await page.getByRole("link", { name: /Apply on organizer/ }).getAttribute("href");
     assert.match(official!, /^https:\/\//);
     assert.equal((await privateEntries(runtime.db, "dev-aya", clock())).length, 0);
-    await page.getByRole("link", { name: /Save to My Hackathons/ }).click();
+    await page.getByRole("link", { name: "Save", exact:true }).click();
     await page.getByRole("button", { name: "Save to My Hackathons", exact: true }).click();
     assert.equal((await privateEntries(runtime.db, "dev-aya", clock()))[0]!.stages[0]!.application, "not-submitted");
     const savedPath = new URL(page.url()).pathname;
@@ -88,12 +88,12 @@ test("private browser journey with two accounts, advancement, conflicts, locales
   });
   await t.test("applied qualifier warns about a conditional final before acceptance", async () => {
     regional = await addOpportunity("Regional Robotics — PRIVATE TEST", "Regional qualifier", "2026-12-01T09:00:00+01:00", "2026-12-01T17:00:00+01:00");
-    await page.getByRole("link", { name: "Français", exact: true }).click();
+    await page.locator(".language-control > summary").click(); await page.getByRole("link", { name: "Français", exact: true }).click();
     assert.equal(await page.locator("html").getAttribute("lang"), "fr");
     assert.equal(new URL(page.url()).pathname, regional);
     assert.equal(await page.getByRole("heading", { name: "Regional qualifier", exact: true }).isVisible(), true);
     await capture("my-french");
-    await page.getByRole("link", { name: "English", exact: true }).click();
+    await page.locator(".language-control > summary").click(); await page.getByRole("link", { name: "English", exact: true }).click();
     await page.locator("details.add-stage-panel > summary").click();
     const form = page.locator("details.add-stage-panel form");
     await fillStage(form, "National final", "2026-12-10T09:00:00+01:00", "2026-12-10T17:00:00+01:00");
@@ -139,7 +139,7 @@ test("private browser journey with two accounts, advancement, conflicts, locales
     assert.equal(await page.locator('section.private-stage input[name="startTime"]').inputValue(),"");
     assert.equal(await page.locator('section.private-stage input[name="startDate"]').inputValue(),"2026-12-10");
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.getByRole("link", { name: "العربية", exact: true }).click();
+    await page.locator(".language-control > summary").click(); await page.getByRole("link", { name: "العربية", exact: true }).click();
     assert.equal(new URL(page.url()).pathname, dayOnly);
     assert.equal(await page.locator("html").getAttribute("lang"), "ar");
     assert.equal(await page.locator("html").getAttribute("dir"), "rtl");

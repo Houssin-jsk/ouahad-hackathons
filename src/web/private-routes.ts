@@ -61,11 +61,11 @@ export function privateRoutes(db: Database, now: () => Date, getConfig: () => Au
     const config = getConfig();
     if (config.mode === "disabled") return null;
     const headers = new Headers({ "Cache-Control": "private, no-store", "Referrer-Policy": path === callbackPath ? "no-referrer" : "same-origin",
-      "Content-Security-Policy": "default-src 'none'; style-src 'self'; img-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+      "Content-Security-Policy": "default-src 'none'; style-src 'self'; font-src 'self'; img-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
       "X-Content-Type-Options": "nosniff" });
     if (path === "/sign-in" && (config.mode === "google" || config.mode === "test-provider")) {
       // Browsers enforce form-action on POST redirects too. Permit only this configured provider.
-      headers.set("Content-Security-Policy", `default-src 'none'; style-src 'self'; img-src 'self'; form-action 'self' ${new URL(config.issuer).origin}; base-uri 'none'; frame-ancestors 'none'`);
+      headers.set("Content-Security-Policy", `default-src 'none'; style-src 'self'; font-src 'self'; img-src 'self'; form-action 'self' ${new URL(config.issuer).origin}; base-uri 'none'; frame-ancestors 'none'`);
     }
     const method = request.method ?? "GET";
     let response: Response | null = null;

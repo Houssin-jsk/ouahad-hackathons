@@ -34,10 +34,11 @@
     "cf": "1.0.0-rc.1",
     "esbuild": "^0.28.2",
     "miniflare": "4.20260730.0",
+    "miniflare-production": "npm:miniflare@5.20261118.0-beta",
     "playwright": "^1.65.1",
+    "sharp": "0.35.5",
     "typescript": "^5.9.3",
-    "wrangler": "4.165.0",
-    "miniflare-production": "npm:miniflare@5.20261118.0-beta"
+    "wrangler": "4.165.0"
   },
   "overrides": {
     "@cloudflare/config": {

@@ -37,7 +37,7 @@ test("test-provider browser sign-in returns to the original private page and lan
   await page.goto(server.url+"/my/new?lang=fr");
   assert.equal(await page.getByRole("button",{name:privateText.fr.continueTest}).isVisible(),true);
   assert.equal(await page.getByText("Aya",{exact:true}).count(),0);
-  await page.getByRole("link",{name:"العربية",exact:true}).click();
+  await page.locator(".language-control > summary").click(); await page.getByRole("link",{name:"العربية",exact:true}).click();
   await approve(page,"one");
   assert.equal(new URL(page.url()).pathname,"/my/new");
   assert.equal(new URL(page.url()).searchParams.get("lang"),"ar");

@@ -8,9 +8,13 @@ The Worker, assets, dedicated production D1 and daily discovery Cron are live at
 
 See [the launch guide](docs/launch.md) for exact PowerShell commands, current verification, official launch evidence, six active discovery sources, the DNS-preserving move, Google setup and remaining production checks. Builds require Node 24.22.0 or a supported newer release; use `npm.cmd ci`, `npm.cmd run test:production`, and `npm.cmd run build`. Normal local previews retain their existing stores; the built Worker preview uses a separate store.
 
-The [transactional email design review](docs/email-design.md) adds local EN/FR/AR HTML previews with unchanged plain-text fallbacks and immutable queued payloads. It has not been deployed or used to send live email.
+The [transactional email design review](docs/email-design.md) adds local EN/FR/AR HTML previews with unchanged plain-text fallbacks and immutable queued payloads. The approved presentation was released in `60343cf`; no additional test emails are sent as part of UI verification.
 
 ## Browser previews
+
+The approved deadline-first agenda and Variant A typography now cover public browsing and the private account area. See [the UI release checks and device checklist](docs/ui-release.md). The [original agenda review](docs/agenda-prototype.md) records the earlier local comparison. Port 4186 remains an isolated local preview with a separate D1 store and frozen clock.
+
+The [focused typography review](docs/typography-review.md) compares Plus Jakarta Sans + Inter (4186) against Inter (4187), with a side-by-side EN/FR/AR screenshot gallery on port 4191. Variant A is the approved product design; B and the comparison gallery remain local review tools. See the release guide for current checks.
 
 From the workspace root, with Node.js 24 or newer:
 

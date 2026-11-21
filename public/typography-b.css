@@ -1,0 +1,2 @@
+/* Variant B has exactly one difference: EN/FR heading family. */
+html:not([dir=rtl]){--public-heading:"Inter",Arial,"Segoe UI",sans-serif}

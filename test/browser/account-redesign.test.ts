@@ -47,7 +47,7 @@ test("personal agenda and captured email flow work in three languages, desktop a
  await signed.getByRole('link',{name:agendaText.en.email,exact:true}).click();
  await signed.getByLabel(agendaText.en.emailAddress,{exact:true}).fill('reader@outlook.com');await signed.getByRole('button',{name:agendaText.en.continue,exact:true}).click();
  assert.match(new URL(signed.url()).pathname,/auth\/email\/code/);
- await signed.getByRole('link',{name:'العربية',exact:true}).click();assert.match(new URL(signed.url()).pathname,/auth\/email\/code/);
+ await signed.locator(".language-control > summary").click(); await signed.getByRole('link',{name:'العربية',exact:true}).click();assert.match(new URL(signed.url()).pathname,/auth\/email\/code/);
  await signed.getByRole('link',{name:agendaText.ar.outbox,exact:true}).click();
  const code=(await signed.locator('.captured-code').innerText()).trim();assert.match(code,/^\d{6}$/);
  const challenge=new URL(signed.url()).searchParams.get('challenge')!;

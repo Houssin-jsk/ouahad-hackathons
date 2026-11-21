@@ -6,12 +6,19 @@ import { languageOf } from "./i18n.ts";
 import { privateRoutes } from "./private-routes.ts";
 import { privateHref } from "./private-page.ts";
 import { privateText } from "./private-i18n.ts";
+import { findSession } from "../private/session.ts";
 
 export const publicAssets = new Map([
   ["/catalog.css", "text/css; charset=utf-8"], ["/private.css", "text/css; charset=utf-8"],
   ["/icons/logo_black.png", "image/png"], ["/icons/app_icon.png", "image/png"],
   ["/auth/google-g.svg", "image/svg+xml"],
+  ["/typography.css", "text/css; charset=utf-8"],
+  ["/fonts/inter-variable.ttf", "font/ttf"], ["/fonts/plus-jakarta-sans-variable.ttf", "font/ttf"],
+  ["/fonts/ibm-plex-sans-arabic-700.ttf", "font/ttf"],
 ]);
+for (const [family,weights] of [["instrument-serif",[400]],["ibm-plex-sans",[400,500,600]],["noto-naskh-arabic",[400]],["ibm-plex-sans-arabic",[400,500,600]]] as const) {
+  for (const weight of weights) publicAssets.set(`/fonts/${family}-${weight}.ttf`,"font/ttf");
+}
 export type CatalogOptions = { auth: AuthConfig; now?: () => Date; asset?: (request: Request) => Promise<Response> };
 
 export async function catalogHandler(request: Request, db: Database, options: CatalogOptions) {
@@ -20,7 +27,7 @@ export async function catalogHandler(request: Request, db: Database, options: Ca
   const send = (status: number, body: string, type = "text/html; charset=utf-8", extra: Record<string, string> = {}) =>
     new Response(method === "HEAD" ? null : body, { status, headers: {
       "Content-Type": type, "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",
-      "Referrer-Policy": "same-origin", "Content-Security-Policy": "default-src 'none'; style-src 'self'; img-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'", ...extra,
+      "Referrer-Policy": "same-origin", "Content-Security-Policy": "default-src 'none'; style-src 'self'; font-src 'self'; img-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'", ...extra,
     } });
   try {
     const url = new URL(request.url), path = url.pathname;
@@ -42,11 +49,14 @@ export async function catalogHandler(request: Request, db: Database, options: Ca
       try { id = decodeURIComponent(encoded); } catch { /* Invalid encoding. */ }
       if (id) {
         const [entry] = await publicCatalog(db, "all", { id, now: now() });
-        if (entry) return send(200, detail(entry, {
-          filters: parseFilters(url.searchParams), section: url.searchParams.get("from") === "archive" ? "/archive" : "/",
+        if (entry) {
+          const signedIn=(options.auth.mode==="demo"||options.auth.mode==="google"||options.auth.mode==="test-provider")
+            && Boolean((await findSession(db,request.headers.get("cookie"),now(),options.auth.policy))?.user_id);
+          return send(200, detail(entry, {
+          filters: parseFilters(url.searchParams), section: url.searchParams.get("from") === "archive" || !url.searchParams.has("from") && entry.archived ? "/archive" : "/",
           privateLink: enabled ? privateText[lang].my : undefined,
-          privateSave: enabled ? { label: privateText[lang].save, href: privateHref(`/my/save?editionId=${encodeURIComponent(id)}`, lang) } : undefined,
-        }));
+          privateSave: enabled ? { label: privateText[lang].save, href: privateHref(signedIn?`/my/save?editionId=${encodeURIComponent(id)}`:`/sign-in?next=${encodeURIComponent(url.pathname+url.search)}`,lang) } : undefined,
+        })); }
       }
     }
     return send(404, messagePage("notFound", lang));

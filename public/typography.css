@@ -1,0 +1,106 @@
+/* Variant A: typography only. All layout, spacing, colors and brand-lockup rules stay in catalog.css. */
+@font-face{font-family:"Plus Jakarta Sans";src:url('/fonts/plus-jakarta-sans-variable.ttf') format('truetype');font-style:normal;font-weight:200 800;font-display:swap}
+@font-face{font-family:"Inter";src:url('/fonts/inter-variable.ttf') format('truetype');font-style:normal;font-weight:100 900;font-display:swap}
+@font-face{font-family:"IBM Plex Sans Arabic";src:url('/fonts/ibm-plex-sans-arabic-700.ttf') format('truetype');font-style:normal;font-weight:700;font-display:swap}
+:root{--public-heading:"Plus Jakarta Sans","IBM Plex Sans Arabic",Arial,"Segoe UI",sans-serif;--public-reading:"Inter","IBM Plex Sans Arabic",Arial,"Segoe UI",sans-serif}
+html[dir=rtl]{--public-heading:"IBM Plex Sans Arabic",Tahoma,Arial,sans-serif;--public-reading:"IBM Plex Sans Arabic",Tahoma,Arial,sans-serif}
+.public-view,.header{font-family:var(--public-reading);font-size:1rem;line-height:1.65;font-optical-sizing:auto;font-synthesis:none}
+[dir=rtl] .public-view,[dir=rtl] .header{font-family:var(--public-reading)}
+.public-view h1,.public-view h2,.public-view h3,.public-view .card h3,.public-view .empty h3,.public-view .detail-panel h3,.public-view .detail-body h2{font-family:var(--public-heading);font-weight:700;font-style:normal;font-stretch:normal;letter-spacing:0;line-height:1.3}
+.public-view .intro h1,.public-view .detail-head h1{font-family:var(--public-heading);font-size:2.75rem;font-weight:700;line-height:1.2;letter-spacing:0}
+.public-view .card h3{font-size:1.5rem;font-weight:650;line-height:1.4;letter-spacing:0}
+.public-view .detail-body h2,.public-view .empty h3{font-size:1.5rem;line-height:1.4;font-weight:700}
+.public-view .detail-panel h3{font-size:1.375rem;line-height:1.45;font-weight:650}
+.public-view .intro-copy,.public-view .listing-summary,.public-view .empty p{font-family:var(--public-reading);font-size:1.03125rem;line-height:1.7;font-weight:400}
+.public-view .detail-head .detail-venue{font-size:1.0625rem;line-height:1.65;font-weight:500}
+.public-view .detail-head .detail-organizer,.public-view .eligibility,.public-view .source-text{font-family:var(--public-reading);font-size:1rem;line-height:1.7}
+.header .main-nav,.header .languages,.public-view .audiences a,.public-view .search-input input,.public-view .search-submit,.public-view .filter-panel>summary,.public-view .control select,.public-view .button,.public-view .sort-form,.public-view .sort-form select,.public-view .sort-form button,.public-view .chip,.public-view .clear-all,.public-view button.open-toggle,.public-view .decision-source,.public-view .check-organizer,.public-view .back a,.public-view .section-link{font-family:var(--public-reading);font-size:.9375rem;font-weight:500;line-height:1.5;letter-spacing:0}
+.public-view .search-input input,.public-view .control select,.public-view .button{font-size:1rem}
+.public-view .button{font-weight:600}
+.header .language-control>summary,.header .mobile-navigation>summary{font-family:var(--public-reading);font-size:.9375rem;font-weight:500;letter-spacing:0;line-height:1.5}
+.header .language-control>summary>span{font-size:.875rem;font-weight:400}
+.header .language-control>summary strong{font-size:.9375rem;font-weight:500}
+.public-view .kicker,.public-view .card-route,.public-view .control,.public-view .row-cutoff dt,.public-view .decision-cutoff dt,.public-view .timing dt,.public-view .timezone,.public-view .row-cutoff .timezone,.public-view .decision-cutoff .timezone,.public-view .save-help,.public-view .verification-date,.public-view .precision-note,.public-view .topics,.public-view .timing-note,.public-view .results-head,.public-view .filter-count,.footer{font-family:var(--public-reading);font-size:.90625rem;line-height:1.65;letter-spacing:0}
+.public-view .kicker,.public-view .card-route{font-weight:500}
+.public-view .badge{font-family:var(--public-reading);font-size:.90625rem;font-weight:600;line-height:1.6}
+.public-view .card-place,.public-view .detail-overview>p:last-child,.public-view .decision-eligibility,.public-view .link-row,.public-view .timing dd{font-family:var(--public-reading);font-size:1rem;line-height:1.65}
+.public-view .results-head strong{font-family:var(--public-reading);font-size:1rem;font-weight:600}
+.public-view .row-cutoff dd,.public-view .decision-cutoff dd{font-family:var(--public-reading);font-size:1.25rem;font-weight:600;line-height:1.5}
+.public-view .row-cutoff .unpublished,.public-view .decision-cutoff .unpublished{font-size:1.125rem;font-weight:600}
+.public-view .timing .application dd{font-size:1.125rem;font-weight:600;line-height:1.6}
+[dir=rtl] .public-view :is(h1,h2,h3),[dir=rtl] .public-view .card h3,[dir=rtl] .public-view .detail-panel h3{font-family:var(--public-heading);font-weight:700;letter-spacing:0;line-height:1.5}
+[dir=rtl] .public-view,[dir=rtl] .public-view .listing-summary,[dir=rtl] .public-view .intro-copy,[dir=rtl] .public-view .source-text,[dir=rtl] .public-view .card-place,[dir=rtl] .public-view .timing-note{line-height:1.8;letter-spacing:0}
+[dir=rtl] .public-view .kicker{font-family:var(--public-reading);letter-spacing:0}
+@media(max-width:48rem){
+ .public-view .intro h1,.public-view .detail-head h1{font-size:2rem;line-height:1.3;font-weight:700;letter-spacing:0}
+ .public-view .card h3{font-size:1.375rem;line-height:1.45;font-weight:650;letter-spacing:0}
+ .public-view .row-cutoff dd,.public-view .decision-cutoff dd{font-size:1.125rem;font-weight:600}
+ [dir=rtl] .public-view .intro h1,[dir=rtl] .public-view .detail-head h1,[dir=rtl] .public-view .card h3{font-weight:700;line-height:1.5;letter-spacing:0}
+}
+.public-view .detail-panel h3{overflow-wrap:anywhere}
+
+/* Approved Variant A throughout the private agenda; the Ouahad brand lockup stays untouched. */
+body,.private-shell{font-family:var(--public-reading);font-size:1rem;line-height:1.65;font-optical-sizing:auto;font-synthesis:none}
+.private-shell :is(h1,h2,h3){font-family:var(--public-heading);font-weight:700;font-style:normal;letter-spacing:0;line-height:1.4;overflow-wrap:anywhere}
+.private-shell .private-heading h1,.private-shell .auth-intro h1{font-size:2.75rem;line-height:1.2;font-weight:700;letter-spacing:0;max-width:none}
+.private-shell .private-content h2{font-size:1.5rem;line-height:1.4}
+.private-shell .next-content h2,.private-shell .row-main h3,.private-shell .save-card h2{font-size:1.5rem;font-weight:650;line-height:1.4}
+.private-shell .empty-agenda h2{font-size:1.75rem;max-width:22ch}
+.private-shell .private-content{font-size:1rem}
+.private-shell :is(.btn,input,select){font-family:var(--public-reading);font-size:1rem;font-weight:500;line-height:1.5;letter-spacing:0}
+.private-shell .btn{font-weight:600;min-height:46px}
+.private-shell :is(input[type=date],input[type=time]){font-size:1rem;max-width:100%;min-width:0;min-height:46px}
+.private-shell :is(.status-tab,.private-form label,.stage-form label,.editor-surface label,.editor-surface legend,.clock-options summary,.domain-progress summary){font-family:var(--public-reading);font-size:.9375rem;line-height:1.6;letter-spacing:0}
+.private-shell .status-tab{min-height:44px}
+.private-shell :is(.help,.private-tag,.row-meta,.row-dates,.next-dates,.private-subtitle,.private-note,.private-dates,.private-dates dt,.save-footer>span,.save-notice,.stage-conditional,.identity,.auth-promise span,.auth-promise p,.auth-card .muted,.auth-footnote,.auth-divider,.local-notice,.local-delivery,.next-action p:not(.kicker),.warnings li>strong,.warnings li p,.warnings small,.no-overlap,.row-conflict,.journey-steps li>span:last-child,.stage-totals dt,.domain-progress li,.domain-progress li span,.reminder-status,.reminder-status small,.entry-intro){font-family:var(--public-reading);font-size:.90625rem;line-height:1.7;letter-spacing:0}
+.private-shell .status-pill{font-family:var(--public-reading);font-size:.875rem;line-height:1.5}
+.private-shell :is(.section-count,.journey-steps strong,.stage-totals dd,.date-stamp,.date-stamp strong,.avatar,.status-tab span){font-family:var(--public-reading);font-weight:600;font-style:normal;letter-spacing:0}
+.private-shell .date-stamp strong{font-size:2.5rem;line-height:1.2}
+.private-shell .date-stamp{font-size:.875rem}
+.private-shell .avatar{flex-shrink:0}
+.private-shell .row-actions{max-width:12rem}
+.private-shell .row-actions .btn .ui-icon{display:inline-block}
+.private-shell .journey-steps li{grid-template-columns:14px minmax(34px,max-content) minmax(0,1fr)}
+.private-shell .private-note{align-items:flex-start}
+.private-shell .section-heading{flex-wrap:wrap}
+.private-shell .auth-grid{grid-template-columns:minmax(0,1fr) minmax(0,410px)}
+.private-shell .private-content :is(.kicker,.next-warning){font-family:var(--public-reading);font-size:.90625rem;letter-spacing:0;line-height:1.6}
+.private-shell .reminder-status>div{min-width:0;overflow-wrap:anywhere}
+.private-shell .private-form,.private-shell .stage-form,.private-shell fieldset{min-width:0}
+.private-shell .editor-surface legend{max-width:100%;overflow-wrap:anywhere}
+[dir=rtl] .private-shell,[dir=rtl] .private-shell :is(p,label,button,input,select,small,span){letter-spacing:0;line-height:1.8}
+[dir=rtl] .private-shell :is(h1,h2,h3){font-family:var(--public-heading);font-weight:700;line-height:1.5;letter-spacing:0}
+/* Explicit SVG size and paint prevent flex shrink, clipping and inherited fill on WebKit. */
+:is(.ui-icon,.catalog-icon){display:inline-block;width:20px!important;height:20px!important;min-width:20px!important;flex:0 0 20px;vertical-align:middle;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.private-shell :is(.kicker,.row-actions,.row-conflict,.editor-surface legend,.no-overlap) .ui-icon{width:20px;height:20px;min-width:20px;flex-basis:20px}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+@media(max-width:48rem){
+ .private-shell .private-heading h1,.private-shell .auth-intro h1{font-size:2rem;line-height:1.3}
+ .private-shell .next-content h2,.private-shell .row-main h3,.private-shell .save-card h2{font-size:1.375rem}
+ .private-shell .auth-grid{grid-template-columns:minmax(0,1fr)}
+ .private-shell .row-actions{max-width:100%}
+ .private-shell .next-content{grid-template-columns:minmax(0,1fr)}
+ .private-shell .date-stamp{flex-direction:row;gap:.5rem;justify-content:flex-start}
+ .private-shell .date-stamp strong{font-size:1.5rem}
+ .private-shell .date-controls{grid-template-columns:minmax(0,1fr)}
+ .private-shell .identity .btn{font-size:.9375rem}
+}
+@media(forced-colors:active){
+ :is(.ui-icon,.catalog-icon){forced-color-adjust:auto;color:CanvasText;stroke:currentColor}
+ :is(.btn,.button,.status-tab,.chip,.audiences a){border:1px solid ButtonText}
+ :is(a,button,input,select,summary):focus-visible{outline:3px solid Highlight;outline-offset:3px}
+ .public-view .cutoff-star{fill:none;stroke:CanvasText}
+}
+
+.private-shell .kicker{font-family:var(--public-reading);font-size:.90625rem;line-height:1.6;letter-spacing:0}
+.private-shell :is(.domain-progress,.clock-options,.add-stage-panel)>summary{display:flex;gap:.5rem;align-items:center;list-style:none}
+.private-shell :is(.domain-progress,.clock-options,.add-stage-panel)>summary::-webkit-details-marker{display:none}
+.private-shell :is(.domain-progress,.clock-options)[open]>summary .ui-icon{transform:rotate(180deg)}
+
+.private-shell :is(.btn,.btn bdi,.ordinary-link,.ordinary-link bdi,.next-action,.warnings,.journey){min-width:0;overflow-wrap:anywhere}
+@media(max-width:760px){.private-shell .agenda-aside{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.private-shell .agenda-aside{grid-template-columns:minmax(0,1fr)}.private-shell .row-actions{width:calc(100% - 42px);min-width:0;flex-wrap:wrap}.private-shell .row-actions .btn{max-width:100%}}
+
+[dir=rtl] .private-shell :is(.next-content h2,.row-main h3,.save-card h2){font-weight:700}
+
+.private-shell .private-content :is(.btn,input,select){font-family:var(--public-reading);font-size:1rem;line-height:1.5}
